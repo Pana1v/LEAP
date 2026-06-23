@@ -1,0 +1,52 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./manuscript.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-05-26>
+(/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/elsarticle/elsarticle.cls
+Document Class: elsarticle 2026/01/09, 3.5: Elsevier Ltd
+(/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/base/fontenc.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/l3kernel/expl3.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/l3packages/xparse/xparse.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/etoolbox/etoolbox.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/base/size10.clo)) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/graphics/graphicx.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/graphics/keyval.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/graphics/graphics.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/graphics/trig.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/graphics-cfg/graphics.cfg) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/graphics-def/pdftex.def))) (./manuscript.spl) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/natbib/natbib.sty)) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/txfonts/txfonts.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/amsmath/amstext.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/amsmath/amsgen.sty)) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/amsmath/amsbsy.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/amsmath/amsopn.sty)) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/amsfonts/amssymb.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/amsfonts/amsfonts.sty)) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/algorithms/algorithm.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/float/float.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/base/ifthen.sty)) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/algorithms/algorithmic.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/base/textcomp.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/xcolor/xcolor.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/graphics-cfg/color.cfg) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/graphics/mathcolor.ltx)) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/booktabs/booktabs.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/multirow/multirow.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/siunitx/siunitx.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/tools/array.sty)) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/iftex/iftex.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/pdfescape/pdfescape.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/infwarerr/infwarerr.sty))) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/hycolor/hycolor.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/refcount/refcount.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/kvoptions/kvoptions.sty))) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/stringenc/stringenc.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/intcalc/intcalc.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/hyperref/puenc.def) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/url/url.sty) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/bitset/bitset.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.def (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty))) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/txfonts/t1txr.fd) (./manuscript.aux) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/txfonts/omltxmi.fd) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/txfonts/omstxsy.fd) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/txfonts/omxtxex.fd) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/txfonts/utxexa.fd) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg)) (./manuscript.out) (./manuscript.out) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/txfonts/ot1txr.fd) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/txfonts/utxmia.fd) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd) (/home/pan-navigator/.TinyTeX/texmf-dist/tex/latex/txfonts/utxsyc.fd) [1{/home/pan-navigator/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/home/pan-navigator/.TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc}] [2]
+Overfull \hbox (0.127pt too wide) in paragraph at lines 89--90
+\T1/txr/m/n/10 search, and the Lin--Kernighan--Helsgaun (LKH) heuris-tic via \T1/cmtt/m/n/10 elkai\T1/txr/m/n/10 ---alongside
+[3] [4] [5] [6] [7] [8] [9 <./figures/paper/fig1_graph_topology.png>] [10]
+Overfull \hbox (7.22469pt too wide) in paragraph at lines 205--206
+\T1/txr/m/n/10 successor-domain \T1/cmtt/m/n/10 alldifferent \T1/txr/m/n/10 rea-son-ing with strongly-connected-component checks
+[11] [12] [13]
+Overfull \hbox (7.11526pt too wide) in paragraph at lines 277--278
+[]\T1/txr/m/n/10 We gen-er-ated 5,000 sce-nar-ios per ob-ject count $\OML/txmi/m/it/10 N \OMS/txsy/m/n/10 2 f\OT1/txr/m/n/10 3\OML/txmi/m/it/10 ; \OT1/txr/m/n/10 5\OML/txmi/m/it/10 ; \OT1/txr/m/n/10 10\OML/txmi/m/it/10 ; \OT1/txr/m/n/10 20\OML/txmi/m/it/10 ; \OT1/txr/m/n/10 40\OML/txmi/m/it/10 ; \OT1/txr/m/n/10 100\OML/txmi/m/it/10 ; \OT1/txr/m/n/10 200\OMS/txsy/m/n/10 g$ \T1/txr/m/n/10 (35,000
+[14]
+Overfull \hbox (52.8164pt too wide) in paragraph at lines 287--288
+\T1/txr/m/n/10 met-ric 2.7.0, OR-Tools 9.x, Con-corde 03.12.19. CP-SAT is in-voked with \T1/cmtt/m/n/10 num_search_workers \T1/txr/m/n/10 = 8
+[15] [16 <./figures/40obj/training/loss.png>] [17 <./figures/40obj/training/win_rate.png>] [18]
+Overfull \hbox (4.29008pt too wide) in paragraph at lines 408--409
+[]\T1/txr/m/n/10 The cyclic star topol-ogy is es-sen-tial: fully con-nected fails catas-troph-i-cally ($\OMS/txsy/m/n/10 ^^@$\T1/txr/m/n/10 24.8%).
+[19 <./figures/40obj/steps/per_step_advantage.png>] [20] [21 <./figures/paper/fig_pareto_n200.png>]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 498.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 498.
+
+[22] [23 <./figures/paper/fig_timing_scaling_v2.png> <./figures/paper/fig_runtime_histogram.png>] [24 <./figures/paper/fig_k_pareto.png>] [25] [26]
+Overfull \hbox (6.67953pt too wide) in paragraph at lines 567--568
+[]\T1/txr/m/n/10 We have pre-sented LEAP (Learning-Enhanced Arc Prun-ing), a frame-work for robotic
+[27]
+Overfull \hbox (1.92949pt too wide) in paragraph at lines 579--579
+[][]\T1/txr/bx/n/10 Declaration of gen-er-a-tive AI and AI-assisted tech-nolo-gies in the manuscript prepa-
+(./manuscript.bbl [28]
+Underfull \hbox (badness 2103) in paragraph at lines 27--29
+[]\T1/txr/m/n/10 V. Nair, et al., Solv-ing mixed in-te-ger pro-grams us-ing neu-ral net-works,
+[29] [30] [31]
+Underfull \hbox (badness 1552) in paragraph at lines 119--121
+[]\T1/txr/m/n/10 Anonymous Au-thor(s), Asym-met-ric pick-and-place se-quenc-ing bench-mark:
+) [32] (./manuscript.aux) )
+(see the transcript file for additional information) </home/pan-navigator/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0800.600pk> </home/pan-navigator/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/public/txfonts/rtxb.pfb></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/public/txfonts/rtxmi.pfb></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/public/txfonts/rtxr.pfb></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/public/txfonts/txex.pfb></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/public/txfonts/txsy.pfb></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/public/txfonts/txsyc.pfb></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></home/pan-navigator/.TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on manuscript.pdf (32 pages, 1006741 bytes).
+Transcript written on manuscript.log.

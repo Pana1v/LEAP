@@ -1,0 +1,28 @@
+{
+  "device": "cpu",
+  "model": "/media/panav/New Volume/binning-dataset/models/gnn_final_40obj.pt",
+  "ilp_timeout_s": 60,
+  "selection_strategy": "2 smallest-greedy_cost val scenarios",
+  "rows": [
+    {
+      "sample": 1,
+      "greedy_cost_stored": 3388.5004234313965,
+      "gnn_cost": 3272.8008056879044,
+      "gnn_time_ms": 214.80192300805356,
+      "ilp_cost": null,
+      "ilp_time_ms": 80418.71767200064,
+      "ilp_status": "no_solution",
+      "gap_pct": null
+    },
+    {
+      "sample": 2,
+      "greedy_cost_stored": 3416.161235809326,
+      "gnn_cost": 3337.755789756775,
+      "gnn_time_ms": 1443.6909790092614,
+      "ilp_cost": null,
+      "ilp_time_ms": 87420.88400099601,
+      "ilp_status": "no_solution",
+      "gap_pct": null
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "A1_fully_connected_extended": {
+    "mean_cost": 4869.452820814848,
+    "mean_gap_vs_greedy": -24.976746637431038,
+    "gap_std": 5.122950689025627,
+    "win_rate": 0.0
+  },
+  "A2_mlp_extended": {
+    "mean_cost": 4843.334016145468,
+    "mean_gap_vs_greedy": -24.257072258375302,
+    "gap_std": 4.318451442549901,
+    "win_rate": 0.0
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "10": {
+    "N": 10,
+    "n_scenarios": 50,
+    "budget_ms": 1000,
+    "greedy_mean": 1030.1917048645018,
+    "methods": {
+      "SA": {
+        "mean_cost": 959.5048876881317,
+        "gap_vs_greedy": 6.861520709455466,
+        "win_rate": 98.0,
+        "mean_time_ms": 1000.2939128875732
+      },
+      "2opt": {
+        "mean_cost": 959.4749180176291,
+        "gap_vs_greedy": 6.864429844751461,
+        "win_rate": 98.0,
+        "mean_time_ms": 1000.0520324707031
+      },
+      "GLS": {
+        "mean_cost": 959.5473791785694,
+        "gap_vs_greedy": 6.857396089713625,
+        "win_rate": 98.0,
+        "mean_time_ms": 1000.0263929367065
+      }
+    }
+  },
+  "40": {
+    "N": 40,
+    "n_scenarios": 50,
+    "budget_ms": 1000,
+    "greedy_mean": 3907.9270014953613,
+    "methods": {
+      "SA": {
+        "mean_cost": 3741.9462038402066,
+        "gap_vs_greedy": 4.247285007924724,
+        "win_rate": 100.0,
+        "mean_time_ms": 1000.473747253418
+      },
+      "2opt": {
+        "mean_cost": 3764.659874055204,
+        "gap_vs_greedy": 3.6660645755495533,
+        "win_rate": 100.0,
+        "mean_time_ms": 1000.2306795120239
+      },
+      "GLS": {
+        "mean_cost": 3743.109534803132,
+        "gap_vs_greedy": 4.217516515256349,
+        "win_rate": 100.0,
+        "mean_time_ms": 1000.054726600647
+      }
+    }
+  },
+  "200": {
+    "N": 200,
+    "n_scenarios": 20,
+    "budget_ms": 1000,
+    "greedy_mean": 18780.937836492063,
+    "methods": {
+      "SA": {
+        "mean_cost": 18435.37057962252,
+        "gap_vs_greedy": 1.8399893545150574,
+        "win_rate": 100.0,
+        "mean_time_ms": 1002.079439163208
+      },
+      "2opt": {
+        "mean_cost": 18449.3067046747,
+        "gap_vs_greedy": 1.7657857914475024,
+        "win_rate": 100.0,
+        "mean_time_ms": 1009.7387790679932
+      },
+      "GLS": {
+        "mean_cost": 18440.622962904225,
+        "gap_vs_greedy": 1.8120227890142633,
+        "win_rate": 100.0,
+        "mean_time_ms": 1000.7500767707825
+      }
+    }
+  }
+}

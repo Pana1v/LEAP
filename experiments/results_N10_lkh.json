@@ -1,0 +1,36 @@
+{
+  "N": 10,
+  "scenarios": [
+    {
+      "idx": 4500,
+      "lkh_cost": 998.7303989939385,
+      "lkh_time_s": 0.007274604999565781,
+      "greedy_cost": 1001.7489852905273,
+      "gap_vs_greedy_pct": 0.3013316051139711
+    },
+    {
+      "idx": 4501,
+      "lkh_cost": 1001.184104069158,
+      "lkh_time_s": 0.004830078999930265,
+      "greedy_cost": 1058.7992134094238,
+      "gap_vs_greedy_pct": 5.441551959104714
+    },
+    {
+      "idx": 4502,
+      "lkh_cost": 849.6530048391965,
+      "lkh_time_s": 0.00658482200014987,
+      "greedy_cost": 955.2355728149414,
+      "gap_vs_greedy_pct": 11.053039792541263
+    }
+  ],
+  "summary": {
+    "mean_cost": 949.8558359674311,
+    "mean_greedy_cost": 1005.2612571716309,
+    "gap_vs_greedy_mean_pct": 5.598641118919983,
+    "gap_vs_greedy_max_pct": 11.053039792541263,
+    "gap_vs_greedy_min_pct": 0.3013316051139711,
+    "time_mean_ms": 6.229835333215306,
+    "time_median_ms": 6.58482200014987,
+    "time_max_ms": 7.274604999565781
+  }
+}

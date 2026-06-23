@@ -1,0 +1,28 @@
+{
+  "dataset_name": "dataset_200_objects",
+  "model_type": "gnn",
+  "hyperparams": {
+    "epochs_per_stage": 3,
+    "epochs_final": 6,
+    "hidden_dim": 128,
+    "heads": 4,
+    "dropout": 0.1,
+    "lr": 0.001,
+    "weight_decay": 0.01,
+    "val_split": 0.1,
+    "accumulate_grad": 8,
+    "seed": 0,
+    "device": "cuda",
+    "num_train_scenarios": 900,
+    "num_val_scenarios": 100,
+    "object_count": 200,
+    "stages": [
+      5,
+      10,
+      20
+    ]
+  },
+  "stage_transitions": [],
+  "final_metrics": null,
+  "num_epochs": 10
+}

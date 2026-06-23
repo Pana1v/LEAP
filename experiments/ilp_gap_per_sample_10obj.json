@@ -1,0 +1,89 @@
+{
+  "device": "cpu",
+  "model": "/media/panav/New Volume/binning-dataset/models/gnn_10obj_best.pt",
+  "data": "/media/panav/New Volume/binning-dataset/data/dataset_10_objects.json",
+  "ilp_source": "stored ilp_costs in dataset (full-N optimum)",
+  "selection_strategy": "10 evenly-spaced-by-greedy-cost val scenarios with full ILP",
+  "rows": [
+    {
+      "sample": 1,
+      "greedy_cost_stored": 789.9215097427368,
+      "gnn_cost": 667.179652094841,
+      "gnn_time_ms": 228.55882000294514,
+      "ilp_cost": 667.179679274559,
+      "gap_pct": -4.073822818934069e-06
+    },
+    {
+      "sample": 2,
+      "greedy_cost_stored": 924.8489990234375,
+      "gnn_cost": 853.3110179901123,
+      "gnn_time_ms": 247.67908098874614,
+      "ilp_cost": 840.4467639923096,
+      "gap_pct": 1.5306447176611948
+    },
+    {
+      "sample": 3,
+      "greedy_cost_stored": 970.8545684814453,
+      "gnn_cost": 938.9959688186646,
+      "gnn_time_ms": 231.65425199840683,
+      "ilp_cost": 927.3540606498718,
+      "gap_pct": 1.255389787222617
+    },
+    {
+      "sample": 4,
+      "greedy_cost_stored": 993.011547088623,
+      "gnn_cost": 832.229603767395,
+      "gnn_time_ms": 40.676874996279366,
+      "ilp_cost": 818.8432493209839,
+      "gap_pct": 1.6347883990631429
+    },
+    {
+      "sample": 5,
+      "greedy_cost_stored": 1023.1446533203125,
+      "gnn_cost": 959.5177302360535,
+      "gnn_time_ms": 210.01441600674298,
+      "ilp_cost": 953.6401033401489,
+      "gap_pct": 0.6163359610526028
+    },
+    {
+      "sample": 6,
+      "greedy_cost_stored": 1047.6670837402344,
+      "gnn_cost": 1004.1583967208862,
+      "gnn_time_ms": 308.2775670045521,
+      "ilp_cost": 1003.5148439407349,
+      "gap_pct": 0.0641298715247877
+    },
+    {
+      "sample": 7,
+      "greedy_cost_stored": 1070.8539276123047,
+      "gnn_cost": 1081.6107549667358,
+      "gnn_time_ms": 19.08768199791666,
+      "ilp_cost": 1025.154112815857,
+      "gap_pct": 5.507137067987349
+    },
+    {
+      "sample": 8,
+      "greedy_cost_stored": 1104.9955291748047,
+      "gnn_cost": 1089.7873780727386,
+      "gnn_time_ms": 42.99602199171204,
+      "ilp_cost": 1066.7958114147186,
+      "gap_pct": 2.155198437415125
+    },
+    {
+      "sample": 9,
+      "greedy_cost_stored": 1144.448486328125,
+      "gnn_cost": 1099.7257232666016,
+      "gnn_time_ms": 83.71111900487449,
+      "ilp_cost": 1076.9032306671143,
+      "gap_pct": 2.119270510995621
+    },
+    {
+      "sample": 10,
+      "greedy_cost_stored": 1365.567153930664,
+      "gnn_cost": 1212.6533150672913,
+      "gnn_time_ms": 419.8284390004119,
+      "ilp_cost": 1209.9649066925049,
+      "gap_pct": 0.2221889543999475
+    }
+  ]
+}

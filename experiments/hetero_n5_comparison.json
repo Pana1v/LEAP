@@ -1,0 +1,26 @@
+{
+  "homogeneous": {
+    "mean_cost": 506.2289984228611,
+    "mean_greedy_cost": 535.1015155315399,
+    "mean_gap_vs_greedy": 5.158965267015437,
+    "gap_std": 7.156811657685973,
+    "win_rate": 74.0,
+    "best_gap_during_training": 5.158965267015437,
+    "n_val": 500,
+    "mean_gap_vs_ilp": 2.4714632305114854,
+    "train_time_s": 301.8162786960602,
+    "n_params": 89089
+  },
+  "heterogeneous": {
+    "mean_cost": 589.3980306429863,
+    "mean_greedy_cost": 535.1015155315399,
+    "mean_gap_vs_greedy": -10.84919665952315,
+    "gap_std": 12.080357477112784,
+    "win_rate": 16.6,
+    "best_gap_during_training": -10.84919665952315,
+    "n_val": 500,
+    "mean_gap_vs_ilp": 19.976039627417748,
+    "train_time_s": 492.62721967697144,
+    "n_params": 434177
+  }
+}

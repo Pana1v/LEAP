@@ -1,0 +1,455 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{\textbf{Near-Optimal Robotic Sorting with Guided Graph Neural Networks}\\
+\thanks{Identify applicable funding agency here. If none, delete this.}
+}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+}
+
+\maketitle
+
+\begin{abstract}
+Robotic pick-and-place (PAP) sequencing underpins critical industrial automation tasks including warehouse order fulfillment, electronics assembly, and recyclable waste sorting. Determining the optimal ordering of $n$ objects to minimize total robot travel time is NP-hard, with the search space growing as $n!$. Existing industrial systems rely on greedy heuristics that are fast but structurally suboptimal, while exact Integer Linear Programming (ILP) solvers guarantee optimality at the cost of exponentially growing computation times that become infeasible beyond moderate problem sizes. We propose a Graph Neural Network (GNN) policy that resolves this trade-off through imitation learning guided by an ILP teacher. The key architectural insight is a heterogeneous directed graph that explicitly models the full pick-and-place cycle: robot, object, and bin nodes are connected by typed edges encoding the robot-to-object, object-to-bin, and bin-to-robot cost legs. This representation captures structural information that flat sequence-to-sequence neural combinatorial optimisation architectures (e.g., Pointer Networks \cite{vinyals2015pointer}, attention models \cite{kool2019attention}) discard. Trained with curriculum learning on ILP-optimal prefixes, our policy achieves costs within 0.03--2.14\% of ILP on 40-object scenes while running at inference speeds that scale to 200+ objects where ILP becomes intractable. The proposed approach generalises across object counts $N \in \{3, 5, 10, 20, 40, 100, 200\}$, consistently outperforming greedy baselines (99/100 win-rate on $N{=}40$).
+\end{abstract}
+
+\begin{IEEEkeywords}
+Graph Neural Networks (GNN), Imitation Learning, Curriculum Learning, Pick-and-Place Sequencing, Robotic Sorting, Combinatorial Optimization, Attention Mechanism.
+\end{IEEEkeywords}
+
+%========================================================================
+\section{Introduction}
+%========================================================================
+
+Pick-and-place (PAP) sequencing is a core planning task in robotic automation: a manipulator must determine the order in which to pick objects from a workspace and deposit them into designated bins so as to minimise total travel time. This problem is fundamental to high-throughput industrial settings including electronics assembly (where SMT machines placing up to 150,000 components per hour are the bottleneck of the production line \cite{AYOB2008893}), warehouse fulfillment (where order-picking accounts for over 60\% of operational costs \cite{cheng2024drl}), and automated waste sorting \cite{gundupalli2020sequence}. The PAP sequencing problem is NP-hard \cite{chalasani1996}: the $n!$ candidate sequences grow combinatorially with the number of objects $n$, making exhaustive search impractical beyond toy instances.
+
+Current industrial systems default to greedy heuristics --- most commonly the nearest-neighbour rule --- which select the closest unpicked object at each step. Rosenkrantz et al.\ \cite{rosenkrantz1977} prove that nearest-neighbour tours are on average 25\% longer than optimal, and the penalty is larger in PAP than in pure routing because greedy selection ignores the placement leg: choosing a nearby object whose bin is far away creates an expensive detour that cascades through the remaining sequence. Han, Feng, and Yu \cite{han2019pap} formally prove that greedy variants (both FIFO and SPT) are suboptimal in conveyor PAP and demonstrate 10--40\% efficiency loss versus dynamic programming on SCARA and Delta industrial robots. Exact methods such as Integer Linear Programming (ILP) guarantee optimality but scale exponentially; beyond $N \approx 30$--$40$ objects, solve times exceed real-time budgets. This leaves a critical gap: an approach that is near-optimal at ILP quality but runs in milliseconds.
+
+PAP sequencing is not an abstract combinatorial puzzle: it is a daily operational bottleneck in three major industrial domains. In semiconductor electronics manufacturing, the component placement sequence problem (CPSP) for SMT pick-and-place machines is the primary determinant of assembly line throughput; a single machine costing USD~300K--1M is the designated bottleneck of the line \cite{AYOB2008893}, and optimised placement sequences increase throughput by 20--30\% over standard heuristics. In e-commerce warehouse fulfillment, order-picking accounts for over 60\% of operational costs, and sequencing errors cascade across the entire logistics chain \cite{cheng2024drl}. In automated waste sorting --- the motivating application of this work --- robotic systems must sort heterogeneous recyclables in real time from a conveyor belt; manual sorting is both hazardous and a production bottleneck in material recovery facilities \cite{gundupalli2020sequence}. Across all three domains, the same structural problem recurs: too many objects, not enough time, and a greedy policy that leaves throughput on the table.
+
+We propose to close this gap with a Graph Neural Network (GNN) policy trained by imitation of an ILP oracle. Unlike prior neural combinatorial optimisation (NCO) methods that model instances as flat sequences of homogeneous points \cite{vinyals2015pointer, kool2019attention}, our architecture represents the workspace as a heterogeneous directed graph with three semantically distinct node types --- robot, object, and bin --- connected by typed edges that encode the full pick-and-place cycle. This structure is the key contribution: it allows the GNN to reason about the coupled cost of both pick and place legs simultaneously, which flat sequence models fundamentally cannot do. It is important to distinguish PAP from TSP: TSP is symmetric ($d(i,j)=d(j,i)$) and involves a single homogeneous node type, whereas PAP has three node types and asymmetric cycle costs where the loaded placement leg differs from the approach leg. This distinction is precisely why Pointer Networks \cite{vinyals2015pointer} and attention-based models \cite{kool2019attention} require structural modification to handle PAP.
+
+The remainder of this paper is organised as follows. Section~\ref{sec:lit} reviews related work in classical and neural combinatorial optimisation. Section~\ref{sec:methods} presents the problem formulation, graph representation, network architecture, and training procedure. Section~\ref{sec:data} describes the dataset and experimental setup. Section~\ref{sec:results} reports results and analysis. Section~\ref{sec:conclusion} concludes with limitations and future directions.
+
+%========================================================================
+\section{Literature Review}\label{sec:lit}
+%========================================================================
+
+\subsection{The PAP Sequencing Problem and Its Relation to TSP}
+
+The pick-and-place sequencing problem shares combinatorial structure with the Travelling Salesman Problem (TSP): both require a minimum-cost permutation over a set of locations. TSP has a 70-year history of algorithmic development \cite{dantzig1954}. However, PAP is strictly harder: TSP involves a single homogeneous node type and symmetric costs, while PAP involves three distinct entity types (robot, object, bin) and asymmetric cycle costs in which the pick leg and placement leg have different geometric and dynamic properties. Collapsing PAP to TSP by treating each object as a city discards the bin assignment entirely and assumes the cost of visiting object $i$ followed by object $j$ is independent of which bin $i$ was deposited in --- an assumption that is false in every real PAP system.
+
+\subsection{Classical Greedy Methods and Their Limits}
+
+The nearest-neighbour heuristic \cite{rosenkrantz1977} is the canonical greedy approach: at each step, select the unvisited node closest to the current position. It runs in $O(n^2)$ and consistently produces tours approximately 25\% longer than optimal on random Euclidean instances. In PAP, this penalty is compounded: greedy selection by pick distance ignores the object-to-bin leg, so the algorithm systematically chooses objects whose bins are far from subsequent picks. Han, Feng, and Yu \cite{han2019pap} formally prove that greedy (both FIFO and SPT variants) are suboptimal in conveyor PAP and demonstrate 10--40\% efficiency loss versus dynamic programming on SCARA and Delta industrial robots. Our own results reproduce this: greedy costs 3.79\% more than our GNN on $N{=}40$ scenarios, consistent with the Han et al.\ characterisation.
+
+\subsection{Sequence-to-Sequence NCO: Pointer Networks}
+
+Vinyals, Fortunato, and Jaitly \cite{vinyals2015pointer} introduced the Pointer Network (Ptr-Net), the first neural architecture for combinatorial sequencing. An attention mechanism acts as a learned pointer over the input set, constructing a tour autoregressively. Ptr-Net demonstrated that sequence-to-sequence models can generalise to variable-length combinatorial problems and was trained on optimal solutions from the Concorde solver. Its critical limitation is the representation: each node is a 2D coordinate, all nodes are of the same type, with the same feature dimensionality. For PAP, this means robot home, object locations, and bin locations must either be collapsed into a single feature space (losing semantic distinctions) or handled by ad-hoc preprocessing.
+
+\subsection{Attention-Based Routing: Kool et al.\ (2019)}
+
+Kool, Van Hoof, and Welling \cite{kool2019attention} replaced Ptr-Net's LSTM encoder with a Transformer, achieving state-of-the-art results on TSP-50 and TSP-100 via REINFORCE training. The Attention Model (AM) uses multi-head self-attention over all city embeddings and a context-aware decoder. It is the de-facto baseline in the NCO literature. However, AM encodes each node as a 2D coordinate embedding. It has no mechanism for typed edges or heterogeneous node features. In PAP, the cost of visiting object $i$ depends not only on its location but also on which bin type it belongs to and on the robot's current position (which changes after each placement). AM would require concatenating all three entity types into a single homogeneous sequence and adding positional or type embeddings --- a workaround that discards the graph's relational structure.
+
+\subsection{Symmetry-Exploiting RL: POMO and Sym-NCO}
+
+Kwon et al.\ \cite{kwon2020pomo} (POMO) and Kim, Park, and Park \cite{kim2022symnco} (Sym-NCO) exploit symmetries of the TSP cost function to improve RL training for NCO. POMO generates $n$ rollouts from $n$ different starting nodes and trains on the best, leveraging the fact that the optimal TSP tour is the same regardless of starting city. Sym-NCO further exploits rotational and reflective symmetries of the Euclidean plane. Both methods assume Euclidean symmetry: POMO's $n$-start symmetry requires all starting positions to yield equivalent-cost optimal tours, and Sym-NCO requires the cost function to be invariant under rotation and reflection. Neither assumption holds in PAP: the robot home position is a fixed asymmetric anchor, bin locations are fixed and type-specific, and the conveyor (in dynamic variants) introduces a directional bias. Applying POMO or Sym-NCO to PAP would require non-trivial reformulation of the symmetry group.
+
+\subsection{Improvement-Based RL: Costa et al.\ (2020)}
+
+Costa, Rhuggenaath, Zhang, and Akcay \cite{costa2020learning2opt} trained a deep RL agent to perform 2-opt local search improvements. Rather than constructing solutions from scratch, the agent learns which pairs of edges to swap in an existing tour. This improvement paradigm is computationally efficient for large instances and achieves competitive results. However, 2-opt is defined over symmetric tours: swapping edges $(i,j)$ and $(k,l)$ for $(i,k)$ and $(j,l)$ has a well-defined cost in TSP. In PAP, a swap involves exchanging two full pick-place cycles, and the cost depends on which bin each object is assigned to. The 2-opt operator must be redefined to account for the bin leg, and the resulting operator is no longer symmetric. This is a structural modification, not a drop-in application.
+
+\subsection{Transformer for Constrained Routing: Xiong et al.\ (2025)}
+
+Xiong et al.\ \cite{xiong2025ropt} proposed RoPT, a route-planning Transformer for last-mile delivery with time-window constraints. RoPT employs a learned decoder mask to enforce feasibility constraints during sequence construction, directly analogous to our logit masking for already-picked objects. RoPT demonstrates that Transformer-based NCO generalises to constrained routing problems. It does not, however, address heterogeneous node types: all nodes are delivery locations with identical feature structures. The time-window enforcement in RoPT is a closest precedent to our validity masking, and we cite it as such.
+
+\subsection{Graph Pointer Networks: Perera et al.\ (2023)}
+
+Perera et al.\ \cite{perera2023gpn} combined a GNN encoder with a Pointer Network decoder and multi-objective deep RL for TSP. This is the closest prior NCO architecture to ours: a GNN provides permutation-invariant node embeddings consumed by a constructive decoder. The GNN encoder allows richer relational reasoning than a flat Transformer when the problem has graph structure. However, Perera et al.\ operate on a homogeneous graph: all nodes are TSP cities with 2D coordinates. The key advance in our work is the heterogeneous star topology with three distinct node types and directed typed edges. This is not present in any existing GNN-NCO architecture for routing problems and constitutes a genuine architectural novelty.
+
+\subsection{GNNs for Combinatorial Optimisation: Cappart et al.\ (2023)}
+
+Cappart, Ch\'{e}telat, Khalil, Lodi, Morris, and Veli\v{c}kovi\'{c} \cite{cappart2023gnnco} provide the most comprehensive theoretical treatment of GNN methods for combinatorial optimisation. Their central argument is that GNNs are the natural architecture for CO because: (1) CO instances are inherently relational; (2) GNNs are permutation-invariant, matching the symmetry of CO solutions; (3) GNNs are sparsity-aware, scaling to large industrial instances; and (4) as problems become richer in node types and constraints, GNN flexibility becomes increasingly more important than sequence model expressivity. Crucially, they state that as one moves from basic problems to richer ones, the GNN architecture's flexibility becomes more important. This directly justifies our heterogeneous graph: PAP is a richer problem than TSP, and its richer structure is most naturally encoded in a GNN.
+
+\subsection{NCO Survey for Industrial Engineering: Chung, Lee, and Tsang (2025)}
+
+Chung, Lee, and Tsang \cite{chung2025ncosurvey} survey RL-based NCO applications across industrial engineering. They document consistent success of NCO methods in scheduling, sequencing, and routing, and identify the PAP sequencing problem as an underexplored domain where standard NCO methods require structural modification due to heterogeneous object categories and robot dynamics. This survey provides strong motivation for positioning work at the intersection of industrial robotics and NCO.
+
+\subsection{The Core Argument: Why GNN Over Sequence Models for PAP}
+
+Synthesising the above, the case for GNN over Ptr-Net, AM, POMO, and 2-opt RL has three layers:
+
+\textbf{Structural representation:} PAP has three semantically distinct node types and asymmetric edge costs. GNNs with type-specific message functions encode this naturally. Sequence models collapse all entities into a single embedding space, discarding type information.
+
+\textbf{Permutation invariance:} GNNs are invariant to node ordering by construction. Ptr-Net with LSTM encoder is not; AM achieves this via Transformer but only for homogeneous nodes. Our GAT encoder is permutation-invariant over all three node types simultaneously.
+
+\textbf{Dynamic graph structure:} As objects are picked, the graph changes: nodes are deactivated, edges are removed. GNNs with dynamic edge construction (our approach) handle this at every step. Static sequence models would require re-encoding the full sequence at each step, which is computationally wasteful and architecturally inelegant.
+
+%========================================================================
+\section{Methods}\label{sec:methods}
+%========================================================================
+
+We propose a Graph Neural Network (GNN) based policy for the robotic bin-picking sequencing problem. We formulate the task as a sequential decision-making process where the agent must select an optimal permutation of objects to minimize total travel cost. The system is trained via Imitation Learning, leveraging expert demonstrations generated by an Integer Linear Programming (ILP) solver. Fig.~\ref{fig:pipeline} provides an overview of the algorithm pipeline: (1) procedural generation of pick-and-place scenarios, (2) offline expert annotation via ILP and greedy solvers, (3) curriculum-based imitation learning, and (4) autoregressive inference rollout.
+
+\subsection{Problem Formulation and Cost Model}
+
+The PAP sequencing problem is NP-hard \cite{chalasani1996}: for $n$ objects, there are $n!$ candidate permutations. Even with dynamic programming, exact optimal solutions require $O(2^n \cdot n)$ operations \cite{han2019pap}, limiting exact methods to $N \approx 20$ objects within a 1-second budget. Industrial settings require planning within the duration of the first pick action (typically $<500$~ms) to enable pipelined execution, ruling out exact solvers for $N > 30$. The objective is therefore to find a policy $\pi_\theta$ that maps the workspace state $S$ to a near-optimal sequence in real time.
+
+We consider a planar pick-and-place task in a bounded workspace of size $W \times W$ with $W = 100.0$. 
+At each decision step $t$, the agent selects one remaining object $a_t \in \{1,\dots,N\}$ to pick and place into its assigned bin. 
+The robot starts at pose $r_0 \in \mathbb{R}^2$ and after placing an object, its pose updates to the corresponding bin location.
+
+We define the step cost as the Euclidean travel distance of a full pick-and-place cycle:
+\begin{equation}
+c_t \;=\; \lVert r_t - o_{a_t} \rVert_2 \;+\; \lVert o_{a_t} - b_{\tau(a_t)} \rVert_2,
+\end{equation}
+where $o_{a_t}$ is the object position, $b_{\tau(a_t)}$ is the position of the object's target bin given by its type $\tau(\cdot)$, and $r_t$ is the robot position at time $t$. 
+The objective is to minimize the total cost $C = \sum_{t=1}^{N} c_t$ over a valid permutation of all objects.
+
+Note that the cost function is asymmetric: the cost of picking object $i$ followed by object $j$ depends on which bin $i$ was deposited in, since the robot's position after placing $i$ is $b_{\tau(i)}$, not $o_i$. This asymmetry distinguishes PAP from standard TSP and is the structural reason why TSP-specific methods (which assume symmetric Euclidean distances) require modification.
+
+\subsection{Dynamic Graph Representation}
+To capture the spatial and semantic relationships of the workspace, we model the system state $S_t$ at time step $t$ as a heterogeneous directed graph $\mathcal{G}_t = (\mathcal{V}, \mathcal{E})$.
+
+\subsubsection{Node Features}
+The vertex set $\mathcal{V}$ consists of three distinct node types: the robot agent, $N$ pickable objects, and $M$ target bins. We construct a node feature matrix $X \in \mathbb{R}^{|\mathcal{V}| \times F}$ comprising:
+
+\textbf{Spatial Coordinates:} The $(x, y)$ positions of the robot, objects, and bins, normalized by the workspace dimensions ($W=100.0$).
+
+\textbf{Semantic Type:} A one-hot encoding vector representing the bin compatibility for each object.
+
+\textbf{Validity Mask:} A binary feature indicating availability. Once an object is picked, this feature transitions to $0$, signaling the node is inactive.
+
+\subsubsection{Node Feature Design (Explicit Vector Layout)}
+In our implementation, each node feature has dimension
+\begin{equation}
+F \;=\; 4 + M + 1,
+\end{equation}
+where $M$ is the number of bins (here $M=4$). 
+We use a unified feature layout across all node types:
+\begin{equation}
+x_i = [p^{(self)}_x, p^{(self)}_y,\; p^{(ref)}_x, p^{(ref)}_y,\; \text{onehot(type)}_{1:M},\; m].
+\end{equation}
+For object nodes, $p^{(self)}$ is the object position, $p^{(ref)}$ is the target bin position determined by the object type, $\text{onehot(type)}$ encodes the assigned bin, and $m\in\{0,1\}$ is the validity mask. The reference position $p^{(ref)}$ encodes the destination of the placement leg directly into the node features, enabling the GNN to reason about the full pick-place cost without requiring multi-hop message passing to discover bin locations.
+For the robot node, we populate only its normalized position and leave the remaining dimensions as zero padding; for bin nodes, we store the bin position in both $p^{(self)}$ and $p^{(ref)}$ and set $\text{onehot(type)}$ to the identity basis for each bin.
+
+\subsubsection{Topology}
+We employ a \textbf{heterogeneous star topology} to enforce a logical information flow through the network. The graph is a structural inductive bias: each directed cycle (robot$\to$object$\to$bin$\to$robot) corresponds exactly to one pick-and-place operation, so the GNN can aggregate cost information along the causal path of each candidate action. The edge set $\mathcal{E}$ is constructed dynamically at each step with the following directed connections:
+
+\textbf{Robot $\to$ Object:} Represents potential pick actions from the robot's current pose. The edge weight implicitly encodes the pick-leg distance $\lVert r_t - o_i \rVert$.
+
+\textbf{Object $\to$ Bin:} Encodes the placement constraint, linking an object to its assigned bin type. This edge captures the placement-leg distance $\lVert o_i - b_{\tau(i)} \rVert$.
+
+\textbf{Bin $\to$ Robot:} Closes the loop, providing feedback on the robot's state after a potential placement. This edge carries information about where the robot will be positioned for the next pick.
+
+This cyclic structure allows the GNN to propagate the cost of a full pick-and-place cycle back to the decision node (the robot), enabling joint reasoning over both legs of each candidate action.
+
+\subsubsection{Dynamic Edge Construction and Action-Conditioning}
+Edges are constructed only for currently valid objects (mask $m=1$), so the graph connectivity changes as the episode progresses.
+For each valid object $i$, we add three directed edges $(\text{robot}\rightarrow i)$, $(i \rightarrow \text{bin}(\tau(i)))$, and $(\text{bin}(\tau(i)) \rightarrow \text{robot})$, forming a compact cyclic star that explicitly represents a full pick-and-place loop.
+This yields a step-conditioned graph in which the action space is represented by object nodes and their connectivity to the robot and the destination bin.
+
+\subsection{Network Architecture}
+Our policy $\pi_\theta$ is parameterized by a Graph Attention Network (GAT). We choose GAT over standard Graph Convolutional Networks (GCN) for a specific reason: the cost of picking object $i$ is not uniform --- it depends on the robot's current position, which changes at every step. GAT's context-sensitive attention weights model this dependence by computing dynamic attention coefficients $\alpha_{ij}$ that reweight neighbours based on contextual relevance (e.g., proximity or type matching). GCN applies fixed aggregation weights that cannot adapt to the robot's changing state.
+
+The architecture consists of two message-passing layers utilizing multi-head attention (4 heads), followed by ReLU activation and dropout regularization ($p=0.1$). During message passing, information propagates through the three-edge-type star: at each layer, the robot node aggregates features from all valid object nodes (weighted by attention), each object node aggregates from its assigned bin node, and each bin node aggregates from the robot. After two layers, each object node's embedding encodes information from the full pick-place cycle, enabling the policy head to score actions based on the complete cost structure.
+
+The node embeddings are aggregated and passed to a Multi-Layer Perceptron (MLP) head, which outputs a scalar logit for each object node representing the unnormalized probability of selection.
+
+\subsubsection{Policy Head and Object-Only Readout}
+After message passing, we apply an MLP to only the object node embeddings to produce one scalar logit per object.
+Formally, if $h^{(L)}$ denotes the final node embeddings after $L$ GAT layers, we take the slice corresponding to object nodes and compute:
+\begin{equation}
+\ell_i = \text{MLP}(h^{(L)}_i), \quad i \in \{1,\dots,N\}. 
+\end{equation}
+This object-only readout ensures the model outputs are aligned with the discrete choice of which object to pick next.
+
+\subsection{Auto-Regressive Decision Making \& Masking}
+The bin picking sequence is generated auto-regressively. At step $t$, the policy predicts an action $a_t$ based on the current graph $\mathcal{G}_t$. To enforce physical constraints, we employ \textbf{logit masking}. The logits corresponding to previously picked objects (where the mask feature is $0$) are set to $-\infty$ prior to the softmax operation:
+
+\begin{equation}
+    P(a_t | s_t) = \text{softmax}(\text{Mask}(\pi_\theta(s_t)))
+\end{equation}
+
+This ensures the probability mass is distributed strictly among valid remaining objects. This masking approach is analogous to the feasibility-enforcing decoder masks in constrained routing models such as RoPT \cite{xiong2025ropt}. During inference, the system selects the object with the highest probability, updates the robot's position to the respective bin location, and reconstructs the graph for step $t+1$.
+
+\subsubsection{Implementation Detail: Masking via Large Negative Logits}
+In practice, we implement $-\infty$ masking by assigning a large negative constant (e.g., $-10^9$) to invalid action logits before the softmax.
+This avoids numerical instability while ensuring invalid objects receive negligible probability mass.
+
+\subsection{Imitation Learning with Teacher Forcing}
+We treat the sequencing problem as a classification task supervised by an expert oracle. The expert provides optimal solution prefixes generated via Integer Linear Programming (ILP) or greedy heuristics where ILP is intractable.
+
+We optimize the network parameters $\theta$ by minimizing the Cross-Entropy loss between the predicted action distribution and the expert's choice. We utilize \textbf{Teacher Forcing} during training: instead of conditioning the next step on the model's own predictions (which may be erroneous early in training), the graph state is updated using the ground-truth expert action. This stabilizes training by preventing error propagation through the sequence.
+
+\subsubsection{Prefix Supervision and Per-Step Cross Entropy}
+For each scenario and prefix length $P$, the expert provides an ordered list $(a_1^\star,\dots,a_P^\star)$.
+At each step $t\le P$, we compute a cross-entropy loss between the predicted logits and the expert-selected object index:
+\begin{equation}
+\mathcal{L}_t(\theta) = \text{CE}\big(\ell(\mathcal{G}_t;\theta),\, a_t^\star\big),
+\end{equation}
+and the stage loss is the mean over the prefix:
+\begin{equation}
+\mathcal{L}(\theta)=\frac{1}{P}\sum_{t=1}^{P}\mathcal{L}_t(\theta).
+\end{equation}
+Teacher forcing updates the graph transition using $a_t^\star$ by marking the chosen object inactive and updating the robot pose to the corresponding bin location.
+
+\subsubsection{Expert Source: ILP Prefixes with Greedy Fallback}
+When available, we train on ILP-provided optimal prefixes for a given length $P$.
+If a scenario lacks an ILP prefix at that stage, we fall back to a greedy expert sequence (when long enough) so that curriculum stages remain trainable even when ILP is missing or intractable.
+
+\subsubsection{Covariate Shift and Limitations of Behaviour Cloning}
+Imitation learning with teacher forcing is subject to compounding errors at inference when the model's own actions deviate from the expert trajectory. This distribution shift between teacher-conditioned and model-conditioned states is a known limitation of behaviour cloning \cite{ross2011dagger}. In our approach, this effect is mitigated by curriculum learning, which ensures the model converges on short-horizon decisions before exposure to full-sequence rollouts. However, it is not fully eliminated. Future work may address this via DAgger-style online data collection \cite{ross2011dagger} or reinforcement learning fine-tuning.
+
+\subsection{Curriculum Learning Strategy}
+To address the combinatorial complexity of full-sequence planning, we implement a \textbf{Curriculum Learning} schedule. The model is not immediately trained on full-length sequences. Instead, we define a set of prefix stages $P \in \{5, 10, 20, 30, 40\}$.
+
+The training process iterates through these stages, restricting the loss computation to the first $P$ steps of the expert trajectory. This allows the model to first master short-horizon local optimization before generalizing to long-horizon dependencies. The curriculum advances only after the model converges on the easier sub-problems, significantly improving final convergence rates on dense scenarios.
+
+\subsubsection{Stage Scheduling and Optimization Stability}
+Curriculum stages $P \in \{5,10,20,30,40\}$ are applied sequentially, skipping any stage that exceeds the object count of the current dataset.
+Earlier stages train for fewer epochs while the final stage receives additional training, focusing model capacity on full-horizon performance.
+
+\subsection{Training Details}
+We optimize the policy parameters with Adam using a learning rate of $3\times 10^{-4}$ and weight decay of $10^{-4}$.
+To stabilize optimization, we apply gradient clipping with a maximum norm of $1.0$.
+We use a cosine annealing learning-rate schedule where $T_{\max}$ is set to the total number of scenario updates across all curriculum stages.
+
+\subsection{Inference Rollout and Evaluation Metrics}
+At inference time, the policy rolls out greedily by selecting $a_t = \arg\max_i \ell_i$ at each step and updating the state auto-regressively until all objects are placed.
+We compute rollout cost using the same pick-and-place distance model used in training transitions, enabling direct comparison to heuristic and ILP baselines.
+We report mean rollout cost and relative gap versus the greedy baseline (and versus ILP cost when available), and also compare against a random ordering baseline for calibration.
+
+\subsection{Computational Complexity}
+Since edges are created only for currently valid objects, each step uses $O(N_t)$ edges where $N_t$ is the number of remaining objects, rather than a fully connected $O(N_t^2)$ graph.
+This sparsity reduces per-step compute and supports near real-time decision making. The total inference complexity for a full $N$-object rollout is $O(\sum_{t=1}^{N} N_t) = O(N^2/2)$, compared to $O(N^2)$ per step for a fully-connected attention model. For $N=40$, this translates to $\sim$170~ms total inference, well within the $<$500~ms industrial planning budget.
+
+%========================================================================
+\section{Dataset and Experimental Setup}\label{sec:data}
+%========================================================================
+
+To rigorously evaluate the proposed GNN policy, we generated a comprehensive dataset covering a wide range of complexities. This section details the data generation process, the expert annotation strategy, and the storage schema used to facilitate efficient training and benchmarking.
+
+\subsection{Scope and Generation}
+We developed a procedural generation script to create synthetic bin-picking scenarios. To analyze scalability, we constructed distinct datasets for varying object counts $N \in \{3, 5, 10, 20, 40, 100, 200\}$. For each object count, we generated \textbf{5,000 unique scenarios}, providing a robust distribution for training and validation.
+
+The workspace is modeled as a 2D plane ($100 \times 100$ units). Bin locations are fixed in a ``corners'' configuration to maximize travel variance, while object positions and robot start poses are sampled uniformly at random within the workspace bounds.
+
+\subsection{Offline Expert Annotation}
+To optimize training efficiency and decouple sequence generation from network training, we utilized an \textbf{offline pre-computation strategy}. Rather than computing targets on-the-fly, we embedded expert solutions directly into the dataset schema.
+
+\subsubsection{ILP Prefixes}
+We implemented a custom Integer Linear Programming (ILP) solver to generate optimal solution prefixes. These prefixes, varying in length $L \in \{5, 10, 15, 20\}$, serve as the ground-truth targets for our Curriculum Learning approach. This ensures the model trains against theoretically perfect sequences without incurring the computational overhead of the ILP solver during the training loop.
+
+\subsubsection{Greedy Baselines}
+Simultaneously, we computed heuristic baselines using a Nearest-Neighbor (Greedy) algorithm for every scenario. Embedding these \texttt{greedy\_sequences} and \texttt{greedy\_costs} allows for rapid benchmarking, enabling us to quantify the gap between our model and standard heuristic approaches instantly.
+
+\subsection{Data Schema}
+Each scenario is serialized in JSON format containing the spatial state and the pre-computed annotations. An example entry for a 10-object scenario is shown in Fig.~\ref{fig:json_sample}. Key fields include \texttt{objects} (list of $(x, y)$ coordinates for all $N$ items), \texttt{types} (integer IDs mapping each object to a specific bin), \texttt{ilp\_prefixes} (a dictionary mapping prefix lengths to the optimal index order), and \texttt{ilp\_costs} (the total travel cost associated with the optimal prefixes).
+
+Additionally, we developed a custom visualization tool to browse and analyse these scenarios, allowing for qualitative assessment of the generated distributions and solved paths.
+
+\begin{figure}[htbp]
+\centering
+\begin{scriptsize}
+\begin{verbatim}
+{
+  "objects": [
+    [53.9, 67.2], [58.2, 53.5], [43.9, 61.7],
+    [45.0, 81.3], [87.1, 40.7], [73.3, 52.3],
+    [55.4, 84.0], [15.7, 17.0], [11.6, 76.6],
+    [72.3, 79.6]
+  ],
+  "types": [2, 3, 0, 1, 3, 1, 3, 3, 2, 3],
+  "bins": [[10, 10], [90, 10], [10, 90], [90, 90]],
+  "start": [61.19, 21.47],
+  "greedy_sequence": [5, 4, 9, 6, 0, 8, 2, 7, 1, 3],
+  "greedy_cost": 835.21,
+  "ilp_prefixes": {
+    "5": [1, 3, 4, 0, 2],
+    "10": [1, 3, 4, 9, 6, 0, 8, 2, 7, 5]
+  },
+  "ilp_costs": {
+    "5": 489.09,
+    "10": 827.20
+  },
+  "metadata": {
+    "object_count": 10,
+    "bin_configuration": "corners",
+    "random_seed": 0
+  }
+}
+\end{verbatim}
+\end{scriptsize}
+\caption{A truncated sample of the dataset schema for a 10-object scenario. The entry embeds spatial data alongside pre-computed Greedy and ILP solution paths.}
+\label{fig:json_sample}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=0.8\linewidth]{Screenshot from 2025-12-29 13-23-07.png}
+    \caption{Dataset visualisation for 5-object scenarios.}
+    \label{fig:dataset5}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=0.8\linewidth]{40.png}
+    \caption{Dataset visualisation for 40-object scenarios.}
+    \label{fig:dataset40}
+\end{figure}
+
+%========================================================================
+\section{Results}\label{sec:results}
+%========================================================================
+
+We evaluate our GNN policy by rolling out the learned auto-regressive picker and measuring the total pick-and-place travel cost (lower is better), consistent with the rollout cost used in our training and evaluation code.
+The goal is to quantify (i) improvement over fast heuristic baselines, (ii) closeness to ILP optimal solutions when available, and (iii) practical runtime advantages at inference-time relative to exact solvers.
+
+\subsection{Cost Comparison vs.\ Baselines}
+Table~\ref{tab:results_40obj_100} shows that our GNN produces consistently lower mean travel cost than Greedy and Random baselines on a representative evaluation run, while also exhibiting lower variance (standard deviation) compared to Greedy. 
+In addition to mean improvements, the win-rate (fraction of scenarios where the GNN cost is lower) demonstrates that the improvement is not driven by a small number of outliers, but is consistent across scenarios.
+
+\begin{table}[htbp]
+\caption{Evaluation results (40 objects, 100 samples). Positive $\Delta$ indicates the GNN is better (lower cost).}
+\label{tab:results_40obj_100}
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Method} & \textbf{Mean Cost} & \textbf{Std Cost} & \textbf{Notes} \\
+\hline
+GNN & 3775.83 & 176.26 & $\Delta$ vs Greedy: +3.79\% \\
+Greedy & 3926.31 & 203.26 & Baseline heuristic \\
+Random & 4894.68 & 217.77 & Sanity lower-bound \\
+\hline
+\end{tabular}
+\vspace{2mm}
+
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Win-rate} & \textbf{Value} \\
+\hline
+GNN beats Greedy & 99/100 (99.0\%) \\
+GNN beats Random & 100/100 (100.0\%) \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Optimality Gap to ILP (Near-Optimal Quality)}
+When ILP solutions are available, our GNN achieves near-optimal costs with small relative gaps while being substantially faster at inference-time.
+Table~\ref{tab:timing_ilp_gap} reports a per-sample breakdown showing that the GNN remains within roughly 0.03\%--2.14\% of ILP cost on these representative cases, indicating that the learned policy can approximate optimal decision-making without running an expensive solver online.
+
+\begin{table}[htbp]
+\caption{Per-sample timing and optimality gap (example subset, 40 objects).}
+\label{tab:timing_ilp_gap}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{S} & \textbf{Model (ms)} & \textbf{ILP (ms)} & \textbf{Model Cost} & \textbf{ILP Cost} & \textbf{Gap} \\
+\hline
+1  & 162.11 & 538.22 & 3842.5 & 3762.2 & 2.14\% \\
+2  & 171.44 & 315.49 & 3607.5 & 3572.8 & 0.97\% \\
+3  & 158.69 & 147.32 & 4148.1 & 4093.5 & 1.33\% \\
+4  & 174.16 & 191.20 & 3816.2 & 3815.1 & 0.03\% \\
+5  & 174.98 & 116.72 & 3984.6 & 3936.6 & 1.22\% \\
+6  & 211.02 & 320.80 & 3805.2 & 3774.9 & 0.80\% \\
+7  & 150.78 & 179.68 & 3863.0 & 3827.8 & 0.92\% \\
+8  & 176.46 & 144.70 & 3817.6 & 3799.3 & 0.48\% \\
+9  & 177.65 & 349.81 & 3883.4 & 3871.1 & 0.32\% \\
+10 & 174.07 & 76.43  & 3725.9 & 3710.7 & 0.41\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Runtime Benefits and Scalability}
+Exact ILP solvers can become impractical as the number of objects grows, and are often capped or skipped beyond a chosen threshold to keep solve time reasonable.
+In contrast, our GNN inference scales via lightweight message passing on a sparse, dynamically constructed star graph (edges only for remaining objects), making it suitable for real-time deployment on dense sorting scenes. At $N{=}40$, GNN inference averages $\sim$170~ms per scenario compared to a mean of $\sim$280~ms for ILP. While the speedup at this scale is moderate, ILP solve times grow exponentially with $N$, whereas GNN inference grows quadratically ($O(N^2/2)$), resulting in substantially larger speedups at $N{=}100$ and $N{=}200$ where ILP becomes intractable entirely.
+
+\subsection{Figures}
+Fig.~\ref{fig:placeholder} provides a qualitative view of the cost comparison across different object counts and baselines, highlighting that the GNN consistently improves upon Greedy and approaches ILP-quality costs (when available) while avoiding solver runtimes.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{results.jpeg}
+    \caption{Travel cost comparison over sample sizes across baselines including Greedy, 2-opt, Simulated Annealing, Random, GNN, and ILP.}
+    \label{fig:placeholder}
+\end{figure}
+
+%========================================================================
+\section{Conclusion and Future Work}\label{sec:conclusion}
+%========================================================================
+
+We have presented a Graph Neural Network policy for robotic pick-and-place sequencing that achieves near-optimal solutions (0.03--2.14\% ILP gap on $N{=}40$) while maintaining inference speeds compatible with real-time industrial deployment. The key architectural insight --- a heterogeneous directed graph with robot, object, and bin nodes connected by typed edges encoding the full pick-and-place cycle --- enables the GNN to capture structural information that flat sequence-to-sequence NCO architectures discard.
+
+The approach has several limitations that motivate future work. The imitation learning framework is subject to covariate shift: at inference, the model conditions on its own (potentially erroneous) states rather than the expert's. DAgger-style online data collection \cite{ross2011dagger} or reinforcement learning fine-tuning (e.g., POMO-style multi-rollout training \cite{kwon2020pomo}) could address this. The current cost model uses Euclidean distance; extending to kinematic or dynamic robot models would improve applicability to specific manipulator platforms. Ablation studies evaluating the contribution of the graph topology, attention mechanism, and curriculum schedule are needed to disentangle the sources of performance gain. Finally, evaluation on physical robotic sorting systems would validate the sim-to-real transfer of the learned policy.
+
+\section*{Acknowledgment}
+% Add acknowledgments here.
+
+\begin{thebibliography}{00}
+
+\bibitem{vinyals2015pointer} O.~Vinyals, M.~Fortunato, and N.~Jaitly, ``Pointer Networks,'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, vol.~28, 2015.
+
+\bibitem{kool2019attention} W.~Kool, H.~Van Hoof, and M.~Welling, ``Attention, learn to solve routing problems!'' in \emph{International Conference on Learning Representations (ICLR)}, 2019.
+
+\bibitem{kwon2020pomo} Y.~D.~Kwon, J.~Choo, B.~Kim, I.~Yoon, Y.~Gwon, and S.~Min, ``POMO: Policy optimization with multiple optima for reinforcement learning,'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, vol.~33, pp.~21188--21198, 2020.
+
+\bibitem{costa2020learning2opt} P.~R.~d~O~Costa, J.~Rhuggenaath, Y.~Zhang, and A.~Akcay, ``Learning 2-opt heuristics for the traveling salesman problem via deep reinforcement learning,'' in \emph{Asian Conference on Machine Learning (ACML)}, PMLR, pp.~465--480, 2020.
+
+\bibitem{kim2022symnco} M.~Kim, J.~Park, and J.~Park, ``Sym-NCO: Leveraging symmetricity for neural combinatorial optimization,'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, vol.~35, pp.~1936--1949, 2022.
+
+\bibitem{cappart2023gnnco} Q.~Cappart, D.~Ch\'{e}telat, E.~B.~Khalil, A.~Lodi, C.~Morris, and P.~Veli\v{c}kovi\'{c}, ``Combinatorial optimization and reasoning with graph neural networks,'' \emph{Journal of Machine Learning Research}, vol.~24, no.~130, pp.~1--61, 2023.
+
+\bibitem{perera2023gpn} J.~Perera, S.-H.~Liu, M.~Mernik, M.~\v{C}repin\v{s}ek, and M.~Ravber, ``A graph pointer network-based multi-objective deep reinforcement learning algorithm for solving the traveling salesman problem,'' \emph{Mathematics}, vol.~11, no.~2, p.~437, 2023.
+
+\bibitem{xiong2025ropt} Z.~Xiong, Y.~Wang, Y.~Tian, L.~Liu, and S.~Zhu, ``RoPT: Route-planning model with transformer,'' \emph{Applied Sciences}, vol.~15, no.~9, p.~4914, 2025.
+
+\bibitem{chung2025ncosurvey} K.~T.~Chung, C.~K.~M.~Lee, and Y.~P.~Tsang, ``Neural combinatorial optimization with reinforcement learning in industrial engineering: a survey,'' \emph{Artificial Intelligence Review}, vol.~58, p.~130, 2025.
+
+\bibitem{han2019pap} S.~D.~Han, S.~W.~Feng, and J.~Yu, ``Toward fast and optimal robotic pick-and-place on a moving conveyor,'' \emph{arXiv preprint arXiv:1912.08009}, 2019.
+
+\bibitem{AYOB2008893} M.~Ayob and G.~Kendall, ``A survey of surface mount device placement machine optimisation: Machine classification,'' \emph{European Journal of Operational Research}, vol.~186, no.~3, pp.~893--914, 2008.
+
+\bibitem{chalasani1996} P.~Chalasani, R.~Motwani, and A.~Rao, ``Algorithms for robot grasp and delivery,'' in \emph{2nd International Workshop on Algorithmic Foundations of Robotics (WAFR)}, 1996.
+
+\bibitem{rosenkrantz1977} D.~J.~Rosenkrantz, R.~E.~Stearns, and P.~M.~Lewis, ``An analysis of several heuristics for the traveling salesman problem,'' \emph{SIAM Journal on Computing}, vol.~6, no.~3, pp.~563--581, 1977.
+
+\bibitem{cheng2024drl} B.~Cheng, T.~Xie, L.~Wang, Q.~Tan, and X.~Cao, ``Deep reinforcement learning driven cost minimization for batch order scheduling in robotic mobile fulfillment systems,'' \emph{Expert Systems with Applications}, vol.~255, 2024.
+
+\bibitem{ross2011dagger} S.~Ross, G.~Gordon, and D.~Bagnell, ``A reduction of imitation learning and structured prediction to no-regret online learning,'' in \emph{Proceedings of AISTATS}, PMLR~15, pp.~627--635, 2011.
+
+\bibitem{dantzig1954} G.~Dantzig, D.~R.~Fulkerson, and S.~M.~Johnson, ``Solution of a large-scale traveling-salesman problem,'' \emph{Journal of the Operations Research Society of America}, vol.~2, no.~4, pp.~393--410, 1954.
+
+\bibitem{gundupalli2020sequence} S.~P.~Gundupalli, R.~Shukla, R.~Gupta, S.~Hait, and A.~Thakur, ``Optimal sequence planning for robotic sorting of recyclables from source-segregated municipal solid waste,'' \emph{Journal of Computing and Information Science in Engineering}, vol.~21, no.~1, p.~014502, 2021.
+
+\bibitem{ojha2025obstacle} P.~Ojha and A.~Thakur, ``Dynamic obstacle avoidance using path reshaping on probabilistic roadmaps for high-degree-of-freedom robots,'' \emph{IEEE Transactions on Artificial Intelligence}, 2025.
+
+\end{thebibliography}
+
+\end{document}

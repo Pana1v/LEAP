@@ -1,0 +1,27 @@
+{
+  "method": "LKH via elkai, solve_tsp(runs=1)",
+  "config": "elkai.DistanceMatrix(int_cost).solve_tsp(runs=1)",
+  "per_n": {
+    "10": {
+      "n_scenarios": 50,
+      "mean_cost": 959.4749180176291,
+      "gap_vs_greedy": 6.864429844751461,
+      "win_rate": 98.0,
+      "mean_time_ms": 1.1499309539794922
+    },
+    "40": {
+      "n_scenarios": 50,
+      "mean_cost": 3740.5810238925887,
+      "gap_vs_greedy": 4.282218617152724,
+      "win_rate": 100.0,
+      "mean_time_ms": 26.971454620361328
+    },
+    "200": {
+      "n_scenarios": 20,
+      "mean_cost": 18426.123565472124,
+      "gap_vs_greedy": 1.88922552275596,
+      "win_rate": 100.0,
+      "mean_time_ms": 5179.020392894745
+    }
+  }
+}

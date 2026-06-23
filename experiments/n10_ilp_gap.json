@@ -1,0 +1,12 @@
+{
+  "n_scenarios": 500,
+  "gnn_mean_cost": 981.3443746831417,
+  "ilp_mean_cost": 958.2044218426943,
+  "greedy_mean_cost": 1036.0371442966461,
+  "mean_gap_vs_ilp_pct": 2.4527811452731614,
+  "std_gap_vs_ilp_pct": 2.3553512786134476,
+  "median_gap_vs_ilp_pct": 1.9280954615671189,
+  "p95_gap_vs_ilp_pct": 7.031538571965501,
+  "mean_gap_vs_greedy_pct": 5.210434582842654,
+  "win_rate_pct": 87.4
+}

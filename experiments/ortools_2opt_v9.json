@@ -1,0 +1,26 @@
+{
+  "method": "OR-Tools 2-opt (GREEDY_DESCENT, use_two_opt only, 1s cap)",
+  "per_n": {
+    "10": {
+      "n_scenarios": 50,
+      "mean_cost": 978.8810239475031,
+      "gap_vs_greedy": 4.980692493903114,
+      "win_rate": 94.0,
+      "mean_time_ms": 0.7158422470092773
+    },
+    "40": {
+      "n_scenarios": 50,
+      "mean_cost": 3764.510205798302,
+      "gap_vs_greedy": 3.6698944387185564,
+      "win_rate": 100.0,
+      "mean_time_ms": 4.253835678100586
+    },
+    "200": {
+      "n_scenarios": 20,
+      "mean_cost": 18449.44384365899,
+      "gap_vs_greedy": 1.7650555883794377,
+      "win_rate": 100.0,
+      "mean_time_ms": 128.47391366958618
+    }
+  }
+}

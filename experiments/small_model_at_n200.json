@@ -1,0 +1,57 @@
+{
+  "config": {
+    "n_scenarios": 20,
+    "k": 15,
+    "device": "cuda"
+  },
+  "models": {
+    "n10": {
+      "model_path": "/media/pan-navigator/New Volume/binning-dataset/models/gnn_10obj_best.pt",
+      "gnn_inference_ms_mean": 891.4753913879395,
+      "gnn_inference_ms_median": 881.927490234375,
+      "total_leap_ms_mean": 1247.4294543266296,
+      "total_leap_ms_median": 1222.8089570999146,
+      "leap_cost_mean": 18449.916621718752,
+      "opt_cost_mean": 18425.862951718747,
+      "gap_mean_pct": 0.1307209556768078,
+      "gap_max_pct": 0.34442742497035334,
+      "gap_min_pct": 0.02619136419818564
+    },
+    "n40": {
+      "model_path": "/media/pan-navigator/New Volume/binning-dataset/models/gnn_final_40obj.pt",
+      "gnn_inference_ms_mean": 1542.6530957221985,
+      "gnn_inference_ms_median": 1237.362265586853,
+      "total_leap_ms_mean": 2231.5138697624207,
+      "total_leap_ms_median": 1628.9421319961548,
+      "leap_cost_mean": 18428.16095671875,
+      "opt_cost_mean": 18425.862951718747,
+      "gap_mean_pct": 0.012353820014343594,
+      "gap_max_pct": 0.03178323069086126,
+      "gap_min_pct": 0.0
+    },
+    "n200": {
+      "model_path": "/media/pan-navigator/New Volume/binning-dataset/models/gnn_final_200obj.pt",
+      "gnn_inference_ms_mean": 1320.8596110343933,
+      "gnn_inference_ms_median": 1206.764578819275,
+      "total_leap_ms_mean": 1928.5866022109985,
+      "total_leap_ms_median": 1616.9718503952026,
+      "leap_cost_mean": 18429.39494671875,
+      "opt_cost_mean": 18425.862951718747,
+      "gap_mean_pct": 0.019146672256854996,
+      "gap_max_pct": 0.05831486531578287,
+      "gap_min_pct": 0.0
+    },
+    "thin_h64_n40": {
+      "model_path": "/media/pan-navigator/New Volume/binning-dataset/models/gnn_thin_h64_n40_curr_to_40.pt",
+      "gnn_inference_ms_mean": 1211.4030003547668,
+      "gnn_inference_ms_median": 1187.7787113189697,
+      "total_leap_ms_mean": 1670.8178758621216,
+      "total_leap_ms_median": 1589.4235372543335,
+      "leap_cost_mean": 18428.40601671875,
+      "opt_cost_mean": 18425.862951718747,
+      "gap_mean_pct": 0.013718205515881623,
+      "gap_max_pct": 0.05575463495175743,
+      "gap_min_pct": 0.0
+    }
+  }
+}

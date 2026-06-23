@@ -1,0 +1,100 @@
+{
+  "config": {
+    "budgets_ms": [
+      25,
+      50,
+      100,
+      200,
+      400,
+      800,
+      1600
+    ],
+    "start": "path_cheapest_arc"
+  },
+  "per_n": {
+    "100": {
+      "leap_gap_pct": 0.011554531044286599,
+      "leap_time_ms": 415.46207904815674,
+      "sweep": [
+        {
+          "budget_ms": 25,
+          "gls_gap_pct": 0.2761151226282209,
+          "gls_time_ms": 25.426597595214844
+        },
+        {
+          "budget_ms": 50,
+          "gls_gap_pct": 0.0747434839814492,
+          "gls_time_ms": 50.45506477355957
+        },
+        {
+          "budget_ms": 100,
+          "gls_gap_pct": 0.025309351291027703,
+          "gls_time_ms": 100.47946453094482
+        },
+        {
+          "budget_ms": 200,
+          "gls_gap_pct": 0.01946538158509836,
+          "gls_time_ms": 200.51082134246826
+        },
+        {
+          "budget_ms": 400,
+          "gls_gap_pct": 0.014808228532104924,
+          "gls_time_ms": 400.54969787597656
+        },
+        {
+          "budget_ms": 800,
+          "gls_gap_pct": 0.011298265943816428,
+          "gls_time_ms": 800.5523824691772
+        },
+        {
+          "budget_ms": 1600,
+          "gls_gap_pct": 0.006391048425267761,
+          "gls_time_ms": 1600.5736589431763
+        }
+      ],
+      "verdict": "LEAP reaches its quality faster than GLS"
+    },
+    "200": {
+      "leap_gap_pct": 0.019146672256854996,
+      "leap_time_ms": 881.9167613983154,
+      "sweep": [
+        {
+          "budget_ms": 25,
+          "gls_gap_pct": 0.16129678577361362,
+          "gls_time_ms": 46.95291519165039
+        },
+        {
+          "budget_ms": 50,
+          "gls_gap_pct": 0.16129678577361362,
+          "gls_time_ms": 50.547945499420166
+        },
+        {
+          "budget_ms": 100,
+          "gls_gap_pct": 0.13143287309961282,
+          "gls_time_ms": 100.30379295349121
+        },
+        {
+          "budget_ms": 200,
+          "gls_gap_pct": 0.041309825260580794,
+          "gls_time_ms": 200.42119026184082
+        },
+        {
+          "budget_ms": 400,
+          "gls_gap_pct": 0.0075157859683045265,
+          "gls_time_ms": 400.68222284317017
+        },
+        {
+          "budget_ms": 800,
+          "gls_gap_pct": 0.003754470011297196,
+          "gls_time_ms": 800.2578735351562
+        },
+        {
+          "budget_ms": 1600,
+          "gls_gap_pct": 0.003748003699290985,
+          "gls_time_ms": 1600.6306767463684
+        }
+      ],
+      "verdict": "LEAP NOT faster-to-quality than GLS"
+    }
+  }
+}

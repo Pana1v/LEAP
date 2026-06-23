@@ -1,0 +1,71 @@
+{
+  "10": {
+    "n_scenarios": 50,
+    "methods": {
+      "LKH (elkai)": {
+        "gap_vs_greedy": 6.864429844751461,
+        "win_rate": 98.0,
+        "mean_time_ms": 4.384641647338867,
+        "mean_cost": 959.4749180176291
+      },
+      "python-tsp SA": {
+        "gap_vs_greedy": 3.462706442091591,
+        "win_rate": 72.0,
+        "mean_time_ms": 33.993377685546875,
+        "mean_cost": 994.5191903342655
+      },
+      "python-tsp 2-opt": {
+        "gap_vs_greedy": 0.629882061839129,
+        "win_rate": 54.0,
+        "mean_time_ms": 0.3456449508666992,
+        "mean_cost": 1023.7027121130056
+      }
+    }
+  },
+  "40": {
+    "n_scenarios": 50,
+    "methods": {
+      "LKH (elkai)": {
+        "gap_vs_greedy": 4.282543242968173,
+        "win_rate": 100.0,
+        "mean_time_ms": 176.67614459991455,
+        "mean_cost": 3740.568337752693
+      },
+      "python-tsp SA": {
+        "gap_vs_greedy": -0.663400402164741,
+        "win_rate": 38.0,
+        "mean_time_ms": 180.43597221374512,
+        "mean_cost": 3933.852204939586
+      },
+      "python-tsp 2-opt": {
+        "gap_vs_greedy": -5.0637450109359134,
+        "win_rate": 0.0,
+        "mean_time_ms": 11.459860801696777,
+        "mean_cost": 4105.8144600646
+      }
+    }
+  },
+  "200": {
+    "n_scenarios": 20,
+    "methods": {
+      "LKH (elkai)": {
+        "gap_vs_greedy": 1.8906129461475976,
+        "win_rate": 100.0,
+        "mean_time_ms": 28919.265460968018,
+        "mean_cost": 18425.86299434741
+      },
+      "python-tsp SA": {
+        "gap_vs_greedy": -12.094443135332988,
+        "win_rate": 0.0,
+        "mean_time_ms": 1004.0282964706421,
+        "mean_cost": 21052.387683408833
+      },
+      "python-tsp 2-opt": {
+        "gap_vs_greedy": -8.327157802438268,
+        "win_rate": 0.0,
+        "mean_time_ms": 984.6212387084961,
+        "mean_cost": 20344.856166914593
+      }
+    }
+  }
+}

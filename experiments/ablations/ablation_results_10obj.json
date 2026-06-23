@@ -1,0 +1,80 @@
+{
+  "A1_cyclic_star": {
+    "mean_cost": 981.3175473493337,
+    "mean_gap_vs_greedy": 5.225342122185099,
+    "gap_std": 4.970647583081961,
+    "win_rate": 88.2
+  },
+  "A1_fully_connected": {
+    "mean_cost": 1205.165888928175,
+    "mean_gap_vs_greedy": -16.757450949682358,
+    "gap_std": 9.363897820501625,
+    "win_rate": 3.0
+  },
+  "A1_knn": {
+    "mean_cost": 1002.8814678174257,
+    "mean_gap_vs_greedy": 3.095813919532984,
+    "gap_std": 5.29012352221915,
+    "win_rate": 74.0
+  },
+  "A2_gat": {
+    "mean_cost": 981.3175473493337,
+    "mean_gap_vs_greedy": 5.225342122185099,
+    "gap_std": 4.970647583081961,
+    "win_rate": 88.2
+  },
+  "A2_gcn": {
+    "mean_cost": 1007.7292532761693,
+    "mean_gap_vs_greedy": 2.623758926189426,
+    "gap_std": 5.428222274112331,
+    "win_rate": 67.2
+  },
+  "A2_mlp": {
+    "mean_cost": 1196.8063053747414,
+    "mean_gap_vs_greedy": -15.903559122905783,
+    "gap_std": 9.066282663522868,
+    "win_rate": 3.2
+  },
+  "A3_curriculum": {
+    "mean_cost": 981.3175473493337,
+    "mean_gap_vs_greedy": 5.225342122185099,
+    "gap_std": 4.970647583081961,
+    "win_rate": 88.2
+  },
+  "A3_no_curriculum": {
+    "mean_cost": 977.3484111863971,
+    "mean_gap_vs_greedy": 5.598949988019357,
+    "gap_std": 4.905112428386394,
+    "win_rate": 89.8
+  },
+  "A4_mixed": {
+    "mean_cost": 981.3175473493337,
+    "mean_gap_vs_greedy": 5.225342122185099,
+    "gap_std": 4.970647583081961,
+    "win_rate": 88.2
+  },
+  "A4_ilp_only": {
+    "mean_cost": 979.2501812636852,
+    "mean_gap_vs_greedy": 5.418162607081025,
+    "gap_std": 4.796850288128568,
+    "win_rate": 90.0
+  },
+  "A4_greedy_only": {
+    "mean_cost": 1038.0353439877033,
+    "mean_gap_vs_greedy": -0.24299044784758517,
+    "gap_std": 3.472834255263986,
+    "win_rate": 45.800000000000004
+  },
+  "A3_curriculum_40obj": {
+    "mean_cost": 3764.508488194704,
+    "mean_gap_vs_greedy": 3.4392271958221876,
+    "gap_std": 1.8844985516744066,
+    "win_rate": 98.6
+  },
+  "A3_no_curriculum_40obj": {
+    "mean_cost": 3902.09198979497,
+    "mean_gap_vs_greedy": -0.07695928314984385,
+    "gap_std": 1.3320420735550962,
+    "win_rate": 48.199999999999996
+  }
+}

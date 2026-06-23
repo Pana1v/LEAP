@@ -1,0 +1,40 @@
+{
+  "10": {
+    "n": 10,
+    "n_scenarios": 500,
+    "val_seed": 42,
+    "val_split": 0.1,
+    "gnn_mean_cost": 973.9028189749718,
+    "ilp_circuit_mean_cost": 956.8444248080078,
+    "ilp_stored_mtz_mean_cost": 956.8444235451221,
+    "greedy_mean_cost": 1034.9359408431053,
+    "circuit_minus_mtz_mean_pct": 8.186364089846488e-08,
+    "circuit_minus_mtz_max_abs_pct": 2.8497560569629115e-05,
+    "mean_gap_vs_ilp_pct": 1.8124237136211079,
+    "std_gap_vs_ilp_pct": 2.0877495299521227,
+    "median_gap_vs_ilp_pct": 1.1132651758706666,
+    "max_gap_vs_ilp_pct": 14.172464770260396,
+    "p95_gap_vs_ilp_pct": 6.166680727024674,
+    "mean_gap_vs_greedy_pct": 5.838628425235813,
+    "win_rate_pct": 89.8
+  },
+  "20": {
+    "n": 20,
+    "n_scenarios": 500,
+    "val_seed": 42,
+    "val_split": 0.1,
+    "gnn_mean_cost": 1900.323781460166,
+    "ilp_circuit_mean_cost": 1862.358262573047,
+    "ilp_stored_mtz_mean_cost": 1862.3582813202142,
+    "greedy_mean_cost": 1986.1970914268493,
+    "circuit_minus_mtz_mean_pct": -9.868020094374063e-07,
+    "circuit_minus_mtz_max_abs_pct": 0.00044892762611846757,
+    "mean_gap_vs_ilp_pct": 2.0330198018040626,
+    "std_gap_vs_ilp_pct": 1.3963694100597315,
+    "median_gap_vs_ilp_pct": 1.8189666962973268,
+    "max_gap_vs_ilp_pct": 7.508886859170707,
+    "p95_gap_vs_ilp_pct": 4.969175315345566,
+    "mean_gap_vs_greedy_pct": 4.291297752331451,
+    "win_rate_pct": 92.60000000000001
+  }
+}

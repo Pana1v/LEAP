@@ -1,0 +1,57 @@
+This is BibTeX, Version 0.99e (TeX Live 2026)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: revised_paper_v9.aux
+The style file: elsarticle-num.bst
+Database file #1: refs.bib
+Warning--empty pages in chalasani1996
+Warning--empty pages in vinyals2015pointer
+Warning--empty pages in kool2019attention
+Warning--empty pages in gasse2019exact
+Warning--empty pages in sun2021sparsify
+Warning--can't use both volume and number fields in fu2021gentsp
+Warning--empty pages in min2023utsp
+Warning--empty pages in loshchilov2019adamw
+Warning--empty pages in perron2023cpsat
+Warning--empty pages in joshi2021rethinking
+You've used 39 entries,
+            2952 wiz_defined-function locations,
+            891 strings with 11219 characters,
+and the built_in function-call counts, 12542 in all, are:
+= -- 1183
+> -- 339
+< -- 17
++ -- 139
+- -- 100
+* -- 775
+:= -- 1580
+add.period$ -- 41
+call.type$ -- 39
+change.case$ -- 41
+chr.to.int$ -- 0
+cite$ -- 49
+duplicate$ -- 455
+empty$ -- 1542
+format.name$ -- 136
+if$ -- 3358
+int.to.chr$ -- 0
+int.to.str$ -- 39
+missing$ -- 37
+newline$ -- 127
+num.names$ -- 39
+pop$ -- 294
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 932
+stack$ -- 0
+substring$ -- 652
+swap$ -- 124
+text.length$ -- 17
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 10
+while$ -- 93
+width$ -- 41
+write$ -- 342
+(There were 10 warnings)

@@ -1,0 +1,55 @@
+{
+  "N": 10,
+  "rows": [
+    {
+      "idx": 4500,
+      "cost": 998.7303989939386,
+      "cost_int": 998730,
+      "status": "OPTIMAL",
+      "time_s": 0.011007797999809554,
+      "greedy_cost": 1001.7489852905273,
+      "gap_vs_greedy_pct": 0.3013316051139598,
+      "lkh_cost": 998.7303989939385
+    },
+    {
+      "idx": 4501,
+      "cost": 1001.1841040691581,
+      "cost_int": 1001185,
+      "status": "OPTIMAL",
+      "time_s": 0.008901135000087379,
+      "greedy_cost": 1058.7992134094238,
+      "gap_vs_greedy_pct": 5.441551959104703,
+      "lkh_cost": 1001.184104069158
+    },
+    {
+      "idx": 4502,
+      "cost": 849.6530048391967,
+      "cost_int": 849652,
+      "status": "OPTIMAL",
+      "time_s": 0.008163301999957184,
+      "greedy_cost": 955.2355728149414,
+      "gap_vs_greedy_pct": 11.053039792541238,
+      "lkh_cost": 849.6530048391965
+    },
+    {
+      "idx": 4503,
+      "cost": 916.8225225928301,
+      "cost_int": 916822,
+      "status": "OPTIMAL",
+      "time_s": 0.006865645999823755,
+      "greedy_cost": 1036.6038513183594,
+      "gap_vs_greedy_pct": 11.555169178002826,
+      "lkh_cost": null
+    },
+    {
+      "idx": 4504,
+      "cost": 1063.5291562517004,
+      "cost_int": 1063529,
+      "status": "OPTIMAL",
+      "time_s": 0.008227498999985983,
+      "greedy_cost": 1145.53369140625,
+      "gap_vs_greedy_pct": 7.158631454469166,
+      "lkh_cost": null
+    }
+  ]
+}

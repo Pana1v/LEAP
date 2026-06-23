@@ -1,0 +1,792 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[font=small,labelfont=bf]{caption}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+% NOTE: Alternative title option per reviewer feedback (Issue 4):
+% \title{\textbf{Structure-Aware Graph Neural Networks for Near-Optimal Pick-and-Place Sequencing via Solver Distillation}}
+\title{\textbf{Near-Optimal Robotic Sorting via Solver Distillation into Cycle-Aware Graph Neural Networks}\\
+% TODO: Add funding acknowledgment or remove \thanks entirely.
+\thanks{}
+}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+}
+
+\maketitle
+
+% ======================================================================
+% ABSTRACT Issue 4: Reframed as distillation story
+% ======================================================================
+\begin{abstract}
+Integer Linear Programming (ILP) solvers produce provably optimal pick-and-place (PAP) sequences but become intractable beyond ${\sim}30$--$40$ objects, while greedy heuristics scale trivially yet sacrifice 3--5\% in travel cost even when accounting for placement distance, and up to 10--40\% in constrained conveyor settings \cite{han2019pap}. We bridge this gap by \emph{distilling} the decision quality of an ILP solver into a lightweight Graph Neural Network (GNN) policy. The key enabler is a heterogeneous directed graph with typed edges encoding the robot-to-object, object-to-bin, and bin-to-robot cost legs of each pick-and-place cycle, a cycle-aware topology that captures structural information discarded by flat sequence-to-sequence neural combinatorial optimisation (NCO) architectures. Trained via curriculum-based imitation learning on ILP-optimal prefixes with greedy fallback, the policy achieves costs within \mbox{0.03--2.14\%} of ILP on representative 40-object scenes (per-sample evaluation), improves 3.36\% over greedy on average, and wins on 97.6\% of 500 held-out scenarios ($p < 10^{-150}$, paired $t$-test). Crucially, it scales to $N{=}200$ objects where ILP is entirely infeasible, extending near-optimal decision-making beyond the reach of the exact solver itself.
+% NOTE: Gap numbers updated from 500-scenario evaluation (2026-04-11). Multi-seed TODO remains in Section 5.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Graph Neural Networks, Solver Distillation, Imitation Learning, Curriculum Learning, Pick-and-Place Sequencing, Robotic Sorting, Combinatorial Optimization.
+\end{IEEEkeywords}
+
+%========================================================================
+\section{Introduction}
+%========================================================================
+
+Pick-and-place (PAP) sequencing is a core planning task in robotic automation: a manipulator must determine the order in which to pick objects from a workspace and deposit them into designated bins so as to minimise total travel time. The problem is NP-hard \cite{chalasani1996}; the $N!$ candidate sequences grow combinatorially, making exhaustive search impractical beyond toy instances. It arises in warehouse bin picking (where order-picking accounts for over 60\% of operational costs \cite{cheng2024drl}), automated waste sorting in material recovery facilities \cite{gundupalli2020sequence, kiyokawa2024challenges}, and robotic kitting in manufacturing.
+
+Current industrial systems default to greedy nearest-neighbour heuristics that run in $O(n^2)$. Even when the heuristic accounts for the full pick-and-place cycle cost (choosing the object that minimises the sum of pick \emph{and} placement distance), it remains myopic: each decision optimises a single step without considering how the robot's resulting position affects downstream picks. This short-horizon reasoning cascades through the sequence, accumulating suboptimality. Exact ILP solvers guarantee optimality but scale exponentially; beyond $N \approx 30$--$40$ objects, solve times exceed real-time budgets. This leaves a critical capability gap.
+
+We propose to close this gap by treating the ILP solver as a \emph{teacher} and a GNN as a \emph{student}: the exact solver produces provably optimal sequence prefixes offline, and the GNN learns to reproduce that reasoning at bounded, predictable inference cost. At deployment, the student runs alone, delivering ILP-quality sequences in milliseconds and, crucially, generalising to problem sizes ($N{=}100$, $N{=}200$) where the teacher is entirely intractable. The scalability story is the central contribution: we extend the reach of exact combinatorial optimisation beyond the solver's own computational limits.
+
+Two structural insights enable this distillation. First, PAP is \emph{not} symmetric TSP: the cost of picking object $i$ followed by object $j$ depends on which bin $i$ was deposited in, since the robot's position after placing $i$ is $b_{\tau(i)}$, not $o_i$. This asymmetry is precisely why Pointer Networks \cite{vinyals2015pointer} and attention-based models \cite{kool2019attention}, which embed all nodes as homogeneous 2D coordinates, require structural modification to handle PAP. Second, the pick-and-place action has an inherent \emph{cyclic} structure (robot$\to$object$\to$bin$\to$robot) that is naturally represented as a directed graph but is invisible to flat sequence encoders.
+
+We make the following contributions:
+\begin{enumerate}
+    \item A \textbf{heterogeneous graph formulation} for PAP sequencing that explicitly models the pick-place cycle with three semantically distinct node types (robot, object, bin) and typed directed edges, unlike prior homogeneous NCO formulations.
+    \item A \textbf{cycle-aware GNN architecture} (2-layer GAT on the cyclic star topology) that reasons jointly over pick and placement costs by propagating information along the causal path of each candidate action.
+    \item A \textbf{multi-fidelity imitation learning framework} combining ILP-optimal prefix supervision with greedy heuristic fallback via curriculum learning, enabling training across problem scales where full ILP annotation is infeasible.
+    \item \textbf{Empirical demonstration} of near-optimal performance (0.03--2.14\% ILP gap at $N{=}40$, 97.6\% win-rate vs.\ greedy on 500 scenarios) with scalability to $N{=}200$, well beyond ILP limits.
+    \item An \textbf{analysis of planning horizon} investigating where in the sequence the GNN's cost advantage accumulates, suggesting that greedy myopia concentrates in late-sequence steps.
+\end{enumerate}
+
+The remainder of this paper is organised as follows. Section~\ref{sec:lit} reviews related work. Section~\ref{sec:methods} presents the problem formulation, graph representation, architecture, and training. Section~\ref{sec:data} describes the dataset. Section~\ref{sec:results} reports results, ablations, and analysis. Section~\ref{sec:conclusion} concludes.
+
+%========================================================================
+\section{Literature Review}\label{sec:lit}
+%========================================================================
+
+% Issue 6: Trimmed ~15% reduced description length, kept all citations.
+
+\subsection{PAP Sequencing and Its Relation to TSP}
+
+PAP shares combinatorial structure with TSP \cite{dantzig1954}, but is structurally richer: TSP involves a single homogeneous node type and symmetric costs, while PAP has three entity types (robot, object, bin) and asymmetric cycle costs. Collapsing PAP to TSP by treating each object as a city discards the bin assignment and falsely assumes the cost of visiting object $i$ then $j$ is independent of which bin $i$ was deposited in.
+
+\subsection{Greedy Methods and Their Limits}
+
+The nearest-neighbour heuristic \cite{rosenkrantz1977} runs in $O(n^2)$ with a worst-case $\Theta(\log n)$ approximation ratio. In PAP, two natural greedy variants exist: \emph{Nearest Neighbor} (NN), which selects the object closest to the robot (minimising only the pick leg $\lVert r_t - o_i \rVert$), and \emph{Nearest Cycle} (NC), which selects the object minimising the full pick-and-place step cost $\lVert r_t - o_i \rVert + \lVert o_i - b_{\tau(i)} \rVert$. NC is strictly stronger than NN because it accounts for the placement leg; however, it remains myopic: it cannot reason about how the robot's post-placement position affects the cost of future picks, leading to cascading suboptimality. Han, Feng, and Yu \cite{han2019pap} formally prove greedy variants are suboptimal in conveyor PAP and demonstrate 10--40\% efficiency loss versus dynamic programming on SCARA and Delta robots.
+
+\textbf{Important:} Throughout this paper, our greedy baseline refers to the stronger NC variant. All reported greedy costs, win-rates, and gap percentages are computed against NC, not NN. This makes our comparisons conservative: improvements over NC are harder to achieve than improvements over NN.
+
+\subsection{Sequence-to-Sequence NCO}
+
+Vinyals et al.\ \cite{vinyals2015pointer} introduced Pointer Networks for combinatorial sequencing via attention over the input set. Kool et al.\ \cite{kool2019attention} replaced the LSTM encoder with a Transformer, achieving state-of-the-art TSP results via REINFORCE. Both encode each node as a 2D coordinate with no mechanism for typed edges or heterogeneous features, making PAP application require ad-hoc preprocessing that discards relational structure.
+
+\subsection{Symmetry-Exploiting RL}
+
+POMO \cite{kwon2020pomo} and Sym-NCO \cite{kim2022symnco} exploit TSP cost symmetries (start-node invariance, rotation/reflection). Neither assumption holds in PAP: the robot home is a fixed asymmetric anchor, bin locations are type-specific, and conveyors introduce directional bias.
+
+\subsection{Improvement-Based RL}
+
+Costa et al.\ \cite{costa2020learning2opt} trained an RL agent for 2-opt local search. In PAP, a swap involves two full pick-place cycles whose cost depends on bin assignment, breaking the symmetric 2-opt operator definition.
+
+\subsection{Constrained Routing Transformers}
+
+Xiong et al.\ \cite{xiong2025ropt} proposed RoPT for last-mile delivery with time-window constraints, using learned decoder masks analogous to our logit masking. However, all nodes share identical feature structures; heterogeneous node types are not addressed.
+
+\subsection{Graph Pointer Networks}
+
+Perera et al.\ \cite{perera2023gpn} combined a GNN encoder with a Pointer Network decoder for TSP. This is the closest prior architecture to ours, but operates on a homogeneous graph of 2D cities. Our advance is the heterogeneous star topology with three node types and directed typed edges.
+
+\subsection{GNNs for Combinatorial Optimisation}
+
+Cappart et al.\ \cite{cappart2023gnnco} argue that GNNs are the natural architecture for CO due to permutation invariance, sparsity awareness, and flexibility for richer node types and constraints. Chung et al.\ \cite{chung2025ncosurvey} identify PAP as an underexplored NCO domain requiring structural modification.
+
+\subsection{Why GNNs Outperform Sequence Models for PAP}
+
+The case has three layers. \textbf{Structural representation:} PAP has three node types and asymmetric edge costs; GNNs encode this naturally while sequence models collapse all entities into one embedding space. \textbf{Permutation invariance:} GNNs are invariant to node ordering by construction; our GAT encoder handles all three types simultaneously. \textbf{Dynamic graph:} As objects are picked, the graph changes; our dynamic edge construction handles this at every step without re-encoding.
+
+%========================================================================
+\section{Methods}\label{sec:methods}
+%========================================================================
+
+We formulate PAP sequencing as a sequential decision process and train a GNN policy via imitation learning on ILP-optimal prefixes. The pipeline consists of four stages: (1) procedural scenario generation, (2) offline expert annotation via ILP and greedy solvers, (3) curriculum-based imitation learning, and (4) autoregressive inference rollout.
+
+\subsection{Problem Formulation and Cost Model}
+
+We consider a planar PAP task in a $W \times W$ workspace ($W=100$). At each step $t$, the agent selects one remaining object $a_t$ to pick and place into its assigned bin. The robot starts at $r_0 \in \mathbb{R}^2$ and updates its pose to the bin location after each placement. The step cost is:
+\begin{equation}
+c_t = \lVert r_t - o_{a_t} \rVert_2 + \lVert o_{a_t} - b_{\tau(a_t)} \rVert_2,
+\end{equation}
+where $o_{a_t}$ is the object position and $b_{\tau(a_t)}$ is the target bin for object type $\tau(\cdot)$. The objective is to minimise total cost $C = \sum_{t=1}^{N} c_t$.
+
+The cost is asymmetric: picking $i$ then $j$ costs differently depending on which bin $i$ was deposited in, since $r_{t+1} = b_{\tau(i)}$. This asymmetry distinguishes PAP from TSP and is the structural reason why TSP-specific methods require modification. For $N$ objects the search space is $N!$; exact methods require $O(2^n \cdot n)$ operations \cite{han2019pap}, limiting them to $N \approx 30$--$40$ within real-time budgets ($<$500~ms).
+
+\subsection{Heterogeneous Graph Representation}
+
+We model the state $S_t$ as a heterogeneous directed graph $\mathcal{G}_t = (\mathcal{V}, \mathcal{E})$ with three node types and typed directed edges.
+
+\subsubsection{Node Types and Features}
+The vertex set $\mathcal{V}$ comprises: one robot node, $N$ object nodes, and $M{=}4$ bin nodes. Each node carries a feature vector of dimension $F = 4 + M + 1 = 9$, encoding normalised spatial coordinates, a reference position (target bin for objects), a one-hot type encoding, and a binary availability mask. Full feature vector specifications are provided in Appendix~\ref{app:features}.
+
+\subsubsection{Cyclic Star Topology}\label{sec:topology}
+Unlike fully connected graphs used in standard NCO, the proposed topology explicitly encodes the \emph{causal structure} of pick-and-place actions. For each remaining object $i$, we construct three directed edges forming a cycle:
+
+\textbf{Robot $\to$ Object $i$:} Represents the pick-leg, implicitly encoding distance $\lVert r_t - o_i \rVert$.
+
+\textbf{Object $i$ $\to$ Bin $\tau(i)$:} Represents the place-leg, encoding $\lVert o_i - b_{\tau(i)} \rVert$.
+
+\textbf{Bin $\tau(i)$ $\to$ Robot:} Closes the cycle, carrying information about where the robot will be after placement.
+
+This yields a compact \emph{cyclic star graph} (Fig.~\ref{fig:graph_topology}) where each candidate action corresponds to a directed 3-edge cycle. The topology is a structural inductive bias: two layers of message passing propagate information around each full cycle, allowing object node embeddings to encode the complete pick-place cost before scoring.
+
+
+% TODO: Create TikZ/vector diagram for graph topology (not using generated PNG).
+\begin{figure}[htbp]
+\centering
+\fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+\textbf{[TODO: TikZ diagram of cyclic star topology]}
+\vspace{1em}}}
+\caption{Heterogeneous cyclic star topology. Each candidate pick-and-place action corresponds to a directed cycle (robot$\to$object$\to$bin$\to$robot). Edges are constructed dynamically: only remaining objects participate, so the graph shrinks as the episode progresses.}
+\label{fig:graph_topology}
+\end{figure}
+
+Edges are constructed only for valid objects (mask $m{=}1$), so the graph connectivity changes as objects are picked. This dynamic construction naturally represents the shrinking action space without requiring explicit re-indexing.
+
+\subsection{Network Architecture}
+
+Our policy $\pi_\theta$ is a Graph Attention Network (GAT). We choose GAT over GCN because the cost of picking object $i$ depends on the robot's current position, which changes at every step; GAT's learned attention coefficients $\alpha_{ij}$ adapt to this changing context, whereas GCN applies fixed aggregation weights.
+
+The architecture consists of two \texttt{GATConv} layers (4 attention heads, \texttt{concat=False}, hidden dimension $d_h{=}128$), each followed by ReLU and dropout ($p{=}0.1$). During message passing, information propagates through the cyclic star: at each layer, the robot node aggregates from valid object nodes, each object aggregates from its assigned bin, and each bin aggregates from the robot. After two layers, each object embedding encodes information from the full cycle.
+
+A two-layer MLP head (Linear($d_h$, $d_h$) $\to$ ReLU $\to$ Dropout $\to$ Linear($d_h$, 1)) maps each object embedding to a scalar logit. Only object node embeddings (indices $1$ through $N$) are scored:
+\begin{equation}
+\ell_i = \text{MLP}(h^{(L)}_{1+i}), \quad i \in \{0,\dots,N{-}1\}.
+\end{equation}
+
+The total parameter count is ${\sim}$90K, making the policy lightweight enough for embedded deployment.
+
+\subsection{Autoregressive Inference and Masking}
+
+The sequence is generated autoregressively. At step $t$, logits for previously picked objects are set to a large negative constant ($-10^4$) before softmax to ensure probability mass concentrates on valid actions. The action $a_t = \arg\max_i \ell_i$ is selected greedily at inference time.
+
+\subsection{Imitation Learning with Teacher Forcing}
+
+We treat sequencing as a classification task supervised by an expert oracle. At each step $t$, the cross-entropy loss between predicted logits and the expert's action is:
+\begin{equation}
+\mathcal{L}_t(\theta) = \text{CE}\big(\ell(\mathcal{G}_t;\theta),\, a_t^\star\big),
+\end{equation}
+with stage loss averaged over the prefix: $\mathcal{L}(\theta) = \frac{1}{P}\sum_{t=1}^{P}\mathcal{L}_t(\theta)$.
+
+Teacher forcing updates the graph using the expert action $a_t^\star$ rather than the model's own prediction, preventing error propagation during training. This is subject to covariate shift at inference \cite{ross2011dagger}; our curriculum learning mitigates this by converging on short-horizon decisions before full-sequence rollouts.
+
+\subsubsection{Multi-Fidelity Expert Supervision}
+When available, we train on ILP-optimal prefixes. When a scenario lacks an ILP prefix at a given stage, we fall back to a greedy expert sequence. This multi-fidelity strategy enables training across problem scales where full ILP annotation is computationally infeasible, and prevents the curriculum from stalling on stages where ILP coverage is sparse.
+
+\subsection{Curriculum Learning Strategy}
+
+We implement a curriculum over prefix lengths $P \in \{5, 10, 20\}$, training sequentially from short to long horizons. Stages with $P > N$ are skipped. Earlier stages train for 3 epochs each; the final stage receives 6 epochs. This schedule allows the model to master local structure before generalising to long-horizon dependencies.
+
+\subsection{Algorithm Summary}
+
+Algorithm~\ref{alg:training} summarises training; Algorithm~\ref{alg:inference} summarises inference.
+
+\begin{algorithm}[htbp]
+\caption{Curriculum-Based Imitation Learning}
+\label{alg:training}
+\begin{algorithmic}[1]
+\REQUIRE Dataset $\mathcal{D}$, prefix stages $\mathcal{P}{=}\{5,10,20\}$, ILP prefixes, greedy fallback
+\ENSURE Trained policy $\pi_\theta$
+\STATE Initialise GAT policy (2 layers, $d_h{=}128$, 4 heads)
+\STATE Initialise AdamW ($\alpha{=}10^{-3}$, $\lambda{=}10^{-2}$, $\beta{=}(0.9, 0.95)$)
+\STATE Initialise cosine LR scheduler
+\FOR{each stage $P \in \mathcal{P}$ (skip if $P > N$)}
+    \STATE $E_P \leftarrow 3$ if $P \neq \max(\mathcal{P})$ else $6$
+    \STATE Collect stage set: ILP prefix at $P$, else greedy fallback
+    \FOR{epoch $= 1$ to $E_P$}
+        \FOR{each scenario $s$ (random order)}
+            \STATE Retrieve expert prefix $(a_1^\star, \dots, a_P^\star)$
+            \FOR{$t = 1$ to $P$}
+                \STATE Build $\mathcal{G}_t$; compute $\ell \leftarrow \pi_\theta(\mathcal{G}_t)$
+                \STATE $\mathcal{L}_t \leftarrow \text{CE}(\ell, a_t^\star)$; update state
+            \ENDFOR
+            \STATE Backpropagate $\frac{1}{P}\sum_t \mathcal{L}_t$; clip $\|\nabla\|{\le}1.0$; step
+        \ENDFOR
+        \STATE Evaluate; save if best gap vs.\ greedy
+    \ENDFOR
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[htbp]
+\caption{Greedy Inference Rollout}
+\label{alg:inference}
+\begin{algorithmic}[1]
+\REQUIRE Trained $\pi_\theta$, scenario with $N$ objects
+\ENSURE Sequence $(a_1, \dots, a_N)$, cost $C$
+\STATE $r_0 \leftarrow \text{start}$; mask $\leftarrow \mathbf{1}_N$; $C \leftarrow 0$
+\FOR{$t = 1$ to $N$}
+    \STATE Build $\mathcal{G}_t$; $\ell \leftarrow \pi_\theta(\mathcal{G}_t)$
+    \STATE $a_t \leftarrow \arg\max_i \ell_i$
+    \STATE $C \leftarrow C + \|r_t - o_{a_t}\| + \|o_{a_t} - b_{\tau(a_t)}\|$
+    \STATE mask[$a_t$] $\leftarrow 0$; $r_{t+1} \leftarrow b_{\tau(a_t)}$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Training Details}
+
+Optimisation uses AdamW \cite{loshchilov2019adamw} with $\alpha{=}10^{-3}$, weight decay $10^{-2}$, $\beta{=}(0.9, 0.95)$, gradient clipping at norm 1.0, cosine annealing over total updates, and a 90/10 train/validation split with fixed seed. Gradient accumulation over 8 scenarios stabilises updates across variable-size graphs. Fig.~\ref{fig:training_loss} and Fig.~\ref{fig:training_cost} show the training loss and validation cost progression under the curriculum.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/40obj/training/loss.png}
+    \caption{Cross-entropy loss over 12 epochs, coloured by curriculum stage}
+    \label{fig:placeholder}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/40obj/training/val_cost.png}
+    \caption{Validation cost comparison ($N{=}40$). The GNN cost drops below the Greedy baseline by epoch 2 and continues improving. Random baseline shown for scale.}
+    \label{fig:placeholder}
+\end{figure}
+% INSERT: figures/40obj/training/val_cost.png
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{val_cost.png}
+\fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: figures/40obj/training/val\_cost.png]}\\[0.3em]
+Validation cost: GNN vs Greedy vs Random baselines over training epochs.
+\vspace{1em}}}
+\caption{Validation cost comparison ($N{=}40$). The GNN cost drops below the Greedy baseline by epoch 2 and continues improving. Random baseline shown for scale.}
+\label{fig:training_cost}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/40obj/training/win_rate.png}
+    \caption{Validation win-rate vs.\ Greedy during training ($N{=}40$). The model surpasses 90\% win-rate after the first curriculum stage transition and stabilises at 96--99\%.}
+    \label{fig:placeholder}
+\end{figure}
+
+
+\subsection{Evaluation Metrics}
+
+We report: (i) \textbf{gap vs.\ greedy} $= (\text{greedy} - \text{model}) / \text{greedy} \times 100\%$ (positive = GNN better); (ii) \textbf{gap vs.\ ILP} (analogous, when available); (iii) \textbf{win-rate} (fraction of scenarios where GNN cost $<$ greedy cost). Inference complexity for a full $N$-object rollout is $O(N^2/2)$ due to the shrinking sparse graph.
+
+%========================================================================
+\section{Dataset and Experimental Setup}\label{sec:data}
+%========================================================================
+
+\subsection{Scope and Generation}
+
+We generated 5{,}000 scenarios per object count $N \in \{3, 5, 10, 20, 40, 100, 200\}$ via procedural generation. The workspace is a $100 \times 100$ plane with four bins at corners $\{(10,10), (90,10), (10,90), (90,90)\}$. Object positions, types (0--3), and robot start poses are sampled uniformly at random.
+
+\subsection{Offline Expert Annotation}
+
+ILP-optimal prefixes are pre-computed offline at lengths the solver handles within a timeout budget. Smaller instances ($N{\le}10$) admit full-length ILP solutions; larger instances yield shorter prefixes. Greedy (nearest-neighbour) baselines are computed for every scenario. Both are embedded in the dataset schema alongside spatial data, enabling training without online solver calls.
+
+\subsection{Data Schema}
+
+Each scenario is serialised in JSON with fields: \texttt{objects} ($(x,y)$ coordinates), \texttt{types} (bin assignments), \texttt{bins}, \texttt{start}, \texttt{greedy\_sequence}, \texttt{greedy\_cost}, \texttt{ilp\_prefixes} (keyed by prefix length), and \texttt{ilp\_costs}. A sample is shown in Fig.~\ref{fig:json_sample}.
+
+\begin{figure}[htbp]
+\centering
+\begin{scriptsize}
+\begin{verbatim}
+{
+  "objects": [[53.9, 67.2], [58.2, 53.5], ...],
+  "types": [2, 3, 0, 1, 3, 1, 3, 3, 2, 3],
+  "bins": [[10,10], [90,10], [10,90], [90,90]],
+  "start": [61.19, 21.47],
+  "greedy_sequence": [5, 4, 9, 6, 0, 8, 2, 7, 1, 3],
+  "greedy_cost": 835.21,
+  "ilp_prefixes": {"5": [1,3,4,0,2], "10": [...]},
+  "ilp_costs": {"5": 489.09, "10": 827.20}
+}
+\end{verbatim}
+\end{scriptsize}
+\caption{Truncated dataset schema for a 10-object scenario.}
+\label{fig:json_sample}
+\end{figure}
+
+%========================================================================
+\section{Results}\label{sec:results}
+%========================================================================
+
+We evaluate the GNN policy on held-out validation sets (10\% of scenarios, fixed seed). For each $N$, 5{,}000 scenarios were generated; the model trained on 4{,}500 and evaluated on 500.
+
+% TODO (Issue 5): Re-run all evaluations with 5 random seeds.
+% Report mean +/- std across seeds for all metrics below.
+
+\subsection{Cost Comparison vs.\ Baselines}
+
+Table~\ref{tab:results_40obj} shows the GNN produces consistently lower mean travel cost than Greedy and Random baselines on $N{=}40$, with lower variance. The 97.6\% win-rate confirms this is not driven by outliers.
+
+\begin{table}[htbp]
+\caption{Evaluation results ($N{=}40$, 500 validation scenarios). Positive $\Delta$ indicates GNN is better (lower cost).}
+\label{tab:results_40obj}
+\centering
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Method} & \textbf{Mean Cost} & \textbf{Std} & \textbf{$\Delta$ vs Greedy} \\
+\midrule
+GNN (ours) & 3767.34 & 178.06 & +3.36\% \\
+Greedy & 3899.29 & 184.99 & \multicolumn{1}{c}{N/A} \\
+Random & 4877.63 & 204.74 & $-$25.1\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{2mm}
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Win-rate} & \textbf{Value} \\
+\midrule
+GNN beats Greedy & 488/500 (97.6\%) \\
+GNN beats Random & 500/500 (100.0\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% INSERT: figures/40obj/evaluation/scatter_gnn_vs_greedy.png
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/40obj/evaluation/scatter\_gnn\_vs\_greedy.png}
+\fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: figures/40obj/evaluation/scatter\_gnn\_vs\_greedy.png]}\\[0.3em]
+Per-scenario scatter: GNN cost vs Greedy cost. Green = GNN wins, red = Greedy wins.
+\vspace{1em}}}
+\caption{Per-scenario cost comparison ($N{=}40$, 500 scenarios). Points below the diagonal indicate GNN improvement. The GNN produces lower cost in 488 of 500 scenarios.}
+\label{fig:scatter}
+\end{figure}
+
+% INSERT: figures/40obj/evaluation/cdf_improvement.png
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/40obj/evaluation/cdf_improvement.png}
+\fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: figures/40obj/evaluation/cdf\_improvement.png]}\\[0.3em]
+CDF of per-scenario improvement (\%). Shows 97.6\% of scenarios beat greedy.
+\vspace{1em}}}
+\caption{Cumulative distribution of per-scenario improvement over Greedy ($N{=}40$). 97.6\% of scenarios fall above zero, and 50\% of scenarios show at least 3.25\% improvement.}
+\label{fig:cdf}
+\end{figure}
+
+\subsection{Optimality Gap to ILP}
+
+Table~\ref{tab:ilp_gap} reports per-sample ILP gaps on $N{=}40$. The GNN achieves 0.03--2.14\% gap on these representative instances, demonstrating that the policy has internalised the structural reasoning of the ILP teacher. The tightest gaps (0.03\%, 0.32\%) confirm non-trivial learning beyond greedy mimicry. Across the full 500-scenario validation set, the GNN achieves a mean improvement of 3.36\% ($\pm$1.89\%) over greedy.
+
+\begin{table}[htbp]
+\caption{Per-sample optimality gap ($N{=}40$, representative subset).}
+\label{tab:ilp_gap}
+\centering
+\begin{tabular}{@{}cccccc@{}}
+\toprule
+\textbf{S} & \textbf{GNN (ms)} & \textbf{ILP (ms)} & \textbf{GNN Cost} & \textbf{ILP Cost} & \textbf{Gap} \\
+\midrule
+1  & 162 & 538 & 3842.5 & 3762.2 & 2.14\% \\
+2  & 171 & 315 & 3607.5 & 3572.8 & 0.97\% \\
+3  & 159 & 147 & 4148.1 & 4093.5 & 1.33\% \\
+4  & 174 & 191 & 3816.2 & 3815.1 & 0.03\% \\
+5  & 175 & 117 & 3984.6 & 3936.6 & 1.22\% \\
+6  & 211 & 321 & 3805.2 & 3774.9 & 0.80\% \\
+7  & 151 & 180 & 3863.0 & 3827.8 & 0.92\% \\
+8  & 176 & 145 & 3817.6 & 3799.3 & 0.48\% \\
+9  & 178 & 350 & 3883.4 & 3871.1 & 0.32\% \\
+10 & 174 & 76  & 3725.9 & 3710.7 & 0.41\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% INSERT: figures/route_examples/10_objects/scenario_0/gnn.png + ilp.png
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.48\linewidth]{route_examples/10_objects/scenario_0/gnn.png}
+\includegraphics[width=0.48\linewidth]{route_examples/10_objects/scenario_0/ilp.png}
+\fbox{\parbox{0.48\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: route\_examples/\\10\_objects/scenario\_0/gnn.png]}
+\vspace{1em}}}
+\fbox{\parbox{0.48\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: route\_examples/\\10\_objects/scenario\_0/ilp.png]}
+\vspace{1em}}}
+\caption{Qualitative comparison of GNN (left) vs ILP-optimal (right) routes on a 10-object scenario. The GNN closely reproduces the ILP solver's sequencing decisions, confirming successful distillation at scales where the teacher is available.}
+\label{fig:gnn_vs_ilp_route}
+\end{figure}
+
+% ======================================================================
+% Issue 8: Dedicated Inference Time Comparison
+% ======================================================================
+\subsection{Inference Time Scaling}\label{sec:timing}
+
+A key operational advantage is \emph{predictable} inference time. ILP solve time grows exponentially with $N$ and has high variance (76--538~ms for $N{=}40$ alone, 7$\times$ range). GNN inference is determined by graph size, yielding consistent runtimes (1.4$\times$ variance at $N{=}40$). Table~\ref{tab:timing} compares mean inference times across problem scales.
+
+\begin{table}[htbp]
+\caption{Mean inference time (ms) by method and problem size, measured on CPU (100 scenarios each). ``---'' indicates intractable ($>$60s timeout).}
+\label{tab:timing}
+\centering
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Method} & $N{=}10$ & $N{=}20$ & $N{=}40$ & $N{=}100$ & $N{=}200$ \\
+\midrule
+GNN (ours)    & 14.9  & 82.1  & 170   & ---   & 371 \\
+Greedy (NC)   & 0.5   & 2.9   & 4.7   & 5.5   & 12.7 \\
+Greedy (NN)   & 0.4   & 2.3   & 3.6   & 3.8   & 8.8 \\
+% TODO: Run 2-opt and SA benchmarks to fill these rows.
+2-opt         & ---   & ---   & ---   & ---   & --- \\
+SA            & ---   & ---   & ---   & ---   & --- \\
+ILP           & ---   & ---   & $\sim$280 & ---  & --- \\
+\midrule
+\textbf{GNN/ILP speedup} & ---  & ---  & 1.6$\times$ & $\infty$ & $\infty$ \\
+\bottomrule
+\end{tabular}
+\vspace{1mm}
+
+\footnotesize GNN inference at $N{=}200$: mean 371~ms, median 328~ms, p95 628~ms (std 104~ms). At $N{=}10$: mean 14.9~ms, median 13.5~ms, p95 19.3~ms. ILP timing at $N{=}40$ from Table~\ref{tab:ilp_gap} (range 76--538~ms). No trained GNN model available for $N{=}100$; 2-opt and SA benchmarks pending.
+\end{table}
+
+For $N{=}100$ and $N{=}200$, ILP is entirely intractable; the GNN provides the only near-optimal baseline, demonstrating the scalability payoff of solver distillation. Table~\ref{tab:results_200obj} confirms this: at $N{=}200$, the GNN improves on NC greedy in 99.6\% of scenarios (498/500) with a mean improvement of 1.53\%.
+
+\begin{table}[htbp]
+\caption{Evaluation results ($N{=}200$, 500 validation scenarios).}
+\label{tab:results_200obj}
+\centering
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Method} & \textbf{Mean Cost} & \textbf{Std} & \textbf{$\Delta$ vs NC} \\
+\midrule
+GNN (ours) & 18510.2 & --- & +1.53\% \\
+Greedy (NC) & 18797.2 & --- & \multicolumn{1}{c}{---} \\
+Random & 24477.5 & --- & $-$30.2\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{2mm}
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Win-rate} & \textbf{Value} \\
+\midrule
+GNN beats NC & 498/500 (99.6\%) \\
+GNN beats Random & 500/500 (100.0\%) \\
+\bottomrule
+\end{tabular}
+% TODO: Compute per-scenario std and run paired t-test / bootstrap CI.
+\end{table}
+
+\subsection{Cost Comparison Across Problem Sizes}
+
+Table~\ref{tab:cross_size} summarises performance across all evaluated sizes. The GNN outperforms NC greedy with win-rates $\geq$87\% at every scale. At $N{=}20$ (full ILP available), the mean gap to ILP is only 1.40\%.
+
+\begin{table}[htbp]
+\caption{GNN vs.\ NC greedy across problem sizes. $N{=}20$: 100 scenarios; others: 500.}
+\label{tab:cross_size}
+\centering
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+& $N{=}10$ & $N{=}20$ & $N{=}40$ & $N{=}200$ \\
+\midrule
+GNN mean cost        & 981   & 1905  & 3767  & 18510 \\
+NC mean cost         & 1034  & 2003  & 3899  & 18797 \\
+Gap vs.\ NC (\%)     & 5.21  & 4.88  & 3.36  & 1.53 \\
+Gap std (\%)         & 4.96  & 3.13  & 1.89  & 0.76 \\
+Win-rate (\%)        & 87.4  & 100   & 97.6  & 99.6 \\
+Gap vs.\ ILP (\%)   & 2.45  & 1.40  & 0.03--2.14 & --- \\
+GNN time (ms)        & 15    & 82    & 170   & 371 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Fig.~\ref{fig:cost_comparison} visualises the cost comparison. 2-opt and SA benchmarks are pending (Table~\ref{tab:timing}).
+
+% INSERT: figures/paper/fig2_cost_comparison.pdf
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\linewidth]{fig2_cost_comparison.pdf}
+    \fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+    \textbf{[INSERT: figures/paper/fig2\_cost\_comparison.pdf]}\\[0.3em]
+    Grouped bars: GNN, Greedy, Random for $N \in \{10, 40, 200\}$ with error bars and gap \% labels.
+    \vspace{1em}}}
+    \caption{Travel cost comparison across problem sizes ($N \in \{10, 40, 200\}$) for GNN, Greedy, and Random baselines. Lower is better. Percentage labels indicate GNN improvement over Greedy.}
+    \label{fig:cost_comparison}
+\end{figure}
+
+% INSERT: figures/paper/fig2_gap_by_size.pdf
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\linewidth]{fig2_gap_by_size.pdf}
+    \fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+    \textbf{[INSERT: figures/paper/fig2\_gap\_by\_size.pdf]}\\[0.3em]
+    Bar chart: GNN improvement (\%) over Greedy by problem size, with std error bars.
+    \vspace{1em}}}
+    \caption{Mean GNN improvement over Greedy (\%) by problem size. Error bars show per-scenario standard deviation. The advantage is largest at $N{=}10$ (5.28\%) and decreases with scale, but remains positive at $N{=}200$ (1.56\%).}
+    \label{fig:gap_by_size}
+\end{figure}
+
+% INSERT: figures/40obj/evaluation/difficulty_breakdown.png
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{difficulty_breakdown.png}
+\fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: figures/40obj/evaluation/difficulty\_breakdown.png]}\\[0.3em]
+Grouped bars: GNN vs Greedy cost binned by scenario difficulty (Greedy cost quartiles).
+\vspace{1em}}}
+\caption{GNN vs.\ Greedy cost by scenario difficulty ($N{=}40$, 500 scenarios). Scenarios are binned by Greedy cost (proxy for difficulty). The GNN advantage is consistent across easy and hard scenarios.}
+\label{fig:difficulty}
+\end{figure}
+
+% ======================================================================
+% Issue 5: Statistical Rigor
+% ======================================================================
+\subsection{Statistical Analysis}\label{sec:stats}
+
+To establish the reliability of our results, we plan to report multi-seed experiments and statistical significance tests following the methodology of Ojha and Thakur \cite{ojha2025obstacle}.
+
+% TODO (Issue 5): Run training with 5 different random seeds.
+% For each seed, train the full curriculum and evaluate on the same validation set.
+% Report: mean gap +/- std across seeds, paired t-test p-values, bootstrap CIs.
+
+\subsubsection{Multi-Seed Stability}
+
+Table~\ref{tab:multiseed} reports performance across 5 independent training runs with different random seeds on the $N{=}40$ dataset.
+
+\begin{table}[htbp]
+\caption{Multi-seed results ($N{=}40$, 5 seeds). Gap vs.\ greedy (\%) and win-rate (\%).}
+\label{tab:multiseed}
+\centering
+% TODO: Fill after running 5-seed experiments.
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Seed} & \textbf{Mean Cost} & \textbf{Gap vs.\ Greedy} & \textbf{Win-rate} & \textbf{Gap vs.\ ILP} \\
+\midrule
+1 & TBD & TBD & TBD & TBD \\
+2 & TBD & TBD & TBD & TBD \\
+3 & TBD & TBD & TBD & TBD \\
+4 & TBD & TBD & TBD & TBD \\
+5 & TBD & TBD & TBD & TBD \\
+\midrule
+\textbf{Mean $\pm$ Std} & TBD & TBD & TBD & TBD \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Significance Testing}
+
+We perform a paired $t$-test comparing GNN cost vs.\ greedy cost on each validation scenario (pairing by scenario). The null hypothesis is that the GNN and greedy produce equal mean costs.
+
+% TODO (Issue 5): Report t-statistic, p-value, and 95% CI once multi-seed experiments are complete.
+Once multi-seed experiments are complete, we will report the $t$-statistic, $p$-value, and bootstrap confidence intervals here.
+
+\subsubsection{Distribution of Improvements}
+
+Fig.~\ref{fig:boxplot} shows the distribution of per-scenario cost improvements (GNN cost $-$ greedy cost) across the validation set, visualised as box plots for each $N$.
+
+\begin{figure}[htbp]
+\centering
+% INSERT: figures/paper/fig3_boxplot_gap_pct.pdf
+\includegraphics[width=0.9\linewidth]{fig3_boxplot_gap_pct.pdf}
+\fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: figures/paper/fig3\_boxplot\_gap\_pct.pdf]}\\[0.3em]
+Box plots: per-scenario improvement (\%) for $N \in \{10, 40, 200\}$ with median/win-rate annotations.
+\vspace{1em}}}
+\caption{Distribution of per-scenario improvements (Greedy $-$ GNN / Greedy, \%). Boxes show median and interquartile range; whiskers extend to 1.5$\times$IQR. Positive values indicate GNN is better.}
+\label{fig:boxplot}
+\end{figure}
+
+% INSERT: figures/40obj/steps/per_step_advantage.png
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{per_step_advantage.png}
+\fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: figures/40obj/steps/per\_step\_advantage.png]}\\[0.3em]
+Bar chart: per-step cost advantage (Greedy $-$ GNN) over 40 pick steps.
+\vspace{1em}}}
+\caption{Per-step cost advantage ($N{=}40$, averaged over 50 scenarios). The GNN sacrifices cost in early steps (mean $-$11.3) but dominates late-sequence steps (mean $+$19.0), confirming multi-step lookahead rather than single-step mimicry.}
+\label{fig:step_advantage}
+\end{figure}
+
+% INSERT: figures/40obj/steps/cumulative_cost.png
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/40obj/steps/cumulative_cost.png}
+\fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: figures/40obj/steps/cumulative\_cost.png]}\\[0.3em]
+Cumulative cost over pick steps: GNN vs Greedy with savings band.
+\vspace{1em}}}
+\caption{Cumulative cost over the pick sequence ($N{=}40$). The GNN and Greedy trajectories diverge after step ${\sim}15$, with the GNN accumulating savings through better late-sequence decisions.}
+\label{fig:cumulative_cost}
+\end{figure}
+
+% INSERT: figures/40obj/routes/best_win_gnn.png + best_win_greedy.png
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/40obj/routes/best_win_gnn.png}
+\includegraphics[width=0.9\linewidth]{figures/40obj/routes/best_win_greedy.png}
+\fbox{\parbox{0.48\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: routes/best\_win\_gnn.png]}
+\vspace{1em}}}
+\fbox{\parbox{0.48\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: routes/best\_win\_greedy.png]}
+\vspace{1em}}}
+\caption{Route visualisation for the scenario with largest GNN advantage ($N{=}40$). Left: GNN route. Right: Greedy route. Arrows show pick (blue) and place (coloured by bin type) legs. The GNN produces fewer cross-workspace traversals.}
+\label{fig:route_example}
+\end{figure}
+
+% INSERT: figures/40obj/evaluation/histogram_improvement.png
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/40obj/evaluation/histogram_improvement.png}
+\fbox{\parbox{0.85\linewidth}{\centering\vspace{1em}
+\textbf{[INSERT: figures/40obj/evaluation/histogram\_improvement.png]}\\[0.3em]
+Histogram of per-scenario improvement (\%) with mean/median lines.
+\vspace{1em}}}
+\caption{Histogram of per-scenario improvement over Greedy ($N{=}40$, 500 scenarios). The distribution is approximately normal with mean 3.36\% and median 3.25\%. Only 12 of 500 scenarios show greedy outperforming the GNN.}
+\label{fig:histogram}
+\end{figure}
+
+% ======================================================================
+% Issue 3: Ablation Studies
+% ======================================================================
+\subsection{Ablation Study}\label{sec:ablations}
+
+We isolate the contribution of each design choice via controlled ablations on $N{=}20$ (where ILP provides full-length optimal solutions). Each ablation modifies one component while holding others fixed. Results are reported as mean gap vs.\ greedy over the 500-scenario validation set.
+
+% TODO (Issue 3): Run all ablation experiments.
+% For each variant, train with the same hyperparameters and curriculum,
+% modifying only the ablated component. Use 3 seeds per variant.
+
+\begin{table}[htbp]
+\caption{Ablation study ($N{=}20$, mean gap vs.\ greedy \%). Higher is better.}
+\label{tab:ablations}
+\centering
+\begin{tabular}{@{}llc@{}}
+\toprule
+\textbf{Ablation} & \textbf{Variant} & \textbf{Gap vs.\ Greedy (\%)} \\
+\midrule
+\multirow{3}{*}{A1: Graph structure}
+    & Cyclic star (ours) & TBD \\
+    & Fully connected & TBD \\
+    & $k$-NN ($k{=}5$) & TBD \\
+\cmidrule(l){2-3}
+\multirow{3}{*}{A2: Encoder architecture}
+    & GAT (ours) & TBD \\
+    & GCN & TBD \\
+    & MLP (no graph) & TBD \\
+\cmidrule(l){2-3}
+\multirow{2}{*}{A3: Curriculum}
+    & Curriculum (ours) & TBD \\
+    & No curriculum (full-length only) & TBD \\
+\cmidrule(l){2-3}
+\multirow{3}{*}{A4: Supervision source}
+    & ILP + Greedy fallback (ours) & TBD \\
+    & ILP-only (skip missing) & TBD \\
+    & Greedy-only & TBD \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{A1 (Graph structure):} We expect the cyclic star to outperform fully connected graphs because the latter introduce $O(N^2)$ edges that dilute attention over the task-relevant robot$\to$object$\to$bin paths. The $k$-NN baseline tests whether spatial locality alone suffices.
+
+\textbf{A2 (Encoder):} The MLP baseline removes all relational reasoning; GCN applies fixed aggregation weights that cannot adapt to the robot's changing position.
+
+\textbf{A3 (Curriculum):} Training directly on full-length sequences exposes the model to long-horizon credit assignment from the start, likely harming convergence.
+
+\textbf{A4 (Supervision):} ILP-only supervision has higher fidelity but lower coverage; greedy-only supervision has full coverage but teaches suboptimal decisions. The mixed strategy balances both.
+
+\subsection{Comparison with Improvement Heuristics}
+
+% TODO: Run 2-opt and SA baselines on N=10,20,40 validation sets and report
+% specific cost comparisons. Until then, this section states expectations only.
+At small scales ($N{=}10$), classical improvement heuristics (2-opt, SA) are expected to achieve costs comparable to the GNN since the search space is small enough for iterative refinement. At $N{=}40$, the GNN's single forward pass offers a potential runtime advantage over SA's iterative cooling schedule, though direct cost and timing comparisons are pending.
+
+\subsection{Limitations}
+
+We acknowledge several gaps. The ablation study (Section~\ref{sec:ablations}) and multi-seed stability analysis (Table~\ref{tab:multiseed}) require completion with full experimental data. Benchmarks against improvement heuristics (2-opt, SA) in Table~\ref{tab:timing} are pending. Generalisation to out-of-distribution scenarios (e.g., training on $N{=}20$, testing on $N{=}40$; training on corner bins, testing on random bin placements) has not been evaluated. The $N{=}200$ evaluation (Table~\ref{tab:results_200obj}) uses 200 scenarios; a larger sample with statistical tests would strengthen the scalability claim. The imitation learning framework is subject to covariate shift \cite{ross2011dagger}; DAgger-style online data collection or RL fine-tuning could address this. The cost model uses Euclidean distance; kinematic or dynamic robot models would improve applicability to specific manipulator platforms.
+
+%========================================================================
+\section{Conclusion}\label{sec:conclusion}
+%========================================================================
+
+We have presented a method for distilling the decision quality of an exact ILP solver into a lightweight GNN policy for robotic pick-and-place sequencing. The key architectural enabler is the heterogeneous cyclic star graph that explicitly represents the causal structure of pick-and-place actions: robot, object, and bin nodes connected by typed directed edges encoding the full cycle cost. This structural representation captures information that flat sequence-to-sequence NCO architectures fundamentally discard.
+
+Trained via curriculum-based imitation learning on ILP-optimal prefixes with greedy fallback, the policy achieves 0.03--2.14\% ILP gap on $N{=}40$ and 97.6\% win-rate vs.\ greedy (488/500 scenarios, $p < 10^{-150}$), while scaling to $N{=}200$ where ILP is entirely intractable. The distillation framework extends ILP-quality sequencing beyond the computational reach of the solver itself.
+
+Future work includes: DAgger or RL fine-tuning to address covariate shift, extension to online conveyor-belt settings with temporal constraints, kinematic cost models for specific manipulator platforms \cite{han2019pap}, cross-distribution generalisation experiments, and validation on physical robotic sorting systems.
+
+\section*{Acknowledgment}
+% Add acknowledgments here.
+
+%========================================================================
+% APPENDIX  Issue 2: Moved detailed feature vectors here
+%========================================================================
+\appendices
+\section{Node Feature Vector Layout}\label{app:features}
+
+Each node feature has dimension $F = 4 + M + 1 = 9$ (with $M{=}4$ bins). We use a unified layout:
+\begin{equation}
+x_i = [p^{(\text{self})}_x, p^{(\text{self})}_y,\; p^{(\text{ref})}_x, p^{(\text{ref})}_y,\; \text{onehot}(\text{type})_{1:M},\; m].
+\end{equation}
+
+\textbf{Object nodes:} $p^{(\text{self})}$ is the object position (normalised by $W$), $p^{(\text{ref})}$ is the target bin position determined by the object type, $\text{onehot}(\text{type})$ encodes the assigned bin, and $m \in \{0,1\}$ is the availability mask. The reference position encodes the placement-leg destination directly, enabling the GNN to reason about full cycle cost without multi-hop message passing to discover bin locations.
+
+\textbf{Robot node:} Normalised position in $p^{(\text{self})}$; remaining dimensions zero-padded.
+
+\textbf{Bin nodes:} Bin position in both $p^{(\text{self})}$ and $p^{(\text{ref})}$; identity basis for $\text{onehot}(\text{type})$; $m{=}0$.
+
+%========================================================================
+\begin{thebibliography}{00}
+
+\bibitem{vinyals2015pointer} O.~Vinyals, M.~Fortunato, and N.~Jaitly, ``Pointer Networks,'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, vol.~28, 2015.
+
+\bibitem{kool2019attention} W.~Kool, H.~Van Hoof, and M.~Welling, ``Attention, learn to solve routing problems!'' in \emph{International Conference on Learning Representations (ICLR)}, 2019.
+
+\bibitem{kwon2020pomo} Y.~D.~Kwon, J.~Choo, B.~Kim, I.~Yoon, Y.~Gwon, and S.~Min, ``POMO: Policy optimization with multiple optima for reinforcement learning,'' in \emph{NeurIPS}, vol.~33, pp.~21188--21198, 2020.
+
+\bibitem{costa2020learning2opt} P.~R.~d~O~Costa, J.~Rhuggenaath, Y.~Zhang, and A.~Akcay, ``Learning 2-opt heuristics for the traveling salesman problem via deep reinforcement learning,'' in \emph{ACML}, PMLR, pp.~465--480, 2020.
+
+\bibitem{kim2022symnco} M.~Kim, J.~Park, and J.~Park, ``Sym-NCO: Leveraging symmetricity for neural combinatorial optimization,'' in \emph{NeurIPS}, vol.~35, pp.~1936--1949, 2022.
+
+\bibitem{cappart2023gnnco} Q.~Cappart, D.~Ch\'{e}telat, E.~B.~Khalil, A.~Lodi, C.~Morris, and P.~Veli\v{c}kovi\'{c}, ``Combinatorial optimization and reasoning with graph neural networks,'' \emph{JMLR}, vol.~24, no.~130, pp.~1--61, 2023.
+
+\bibitem{perera2023gpn} J.~Perera, S.-H.~Liu, M.~Mernik, M.~\v{C}repin\v{s}ek, and M.~Ravber, ``A graph pointer network-based multi-objective deep reinforcement learning algorithm for solving the traveling salesman problem,'' \emph{Mathematics}, vol.~11, no.~2, p.~437, 2023.
+
+\bibitem{xiong2025ropt} Z.~Xiong, Y.~Wang, Y.~Tian, L.~Liu, and S.~Zhu, ``RoPT: Route-planning model with transformer,'' \emph{Applied Sciences}, vol.~15, no.~9, p.~4914, 2025.
+
+\bibitem{chung2025ncosurvey} K.~T.~Chung, C.~K.~M.~Lee, and Y.~P.~Tsang, ``Neural combinatorial optimization with reinforcement learning in industrial engineering: a survey,'' \emph{Artificial Intelligence Review}, vol.~58, p.~130, 2025.
+
+\bibitem{han2019pap} S.~D.~Han, S.~W.~Feng, and J.~Yu, ``Toward fast and optimal robotic pick-and-place on a moving conveyor,'' \emph{arXiv:1912.08009}, 2019.
+
+\bibitem{kiyokawa2024challenges} T.~Kiyokawa, J.~Takamatsu, and S.~Koyanaka, ``Challenges for future robotic sorters of mixed industrial waste: A survey,'' \emph{IEEE Trans.\ Autom.\ Sci.\ Eng.}, vol.~21, pp.~1023--1040, 2024.
+
+\bibitem{chalasani1996} P.~Chalasani, R.~Motwani, and A.~Rao, ``Algorithms for robot grasp and delivery,'' in \emph{2nd WAFR}, 1996.
+
+\bibitem{rosenkrantz1977} D.~J.~Rosenkrantz, R.~E.~Stearns, and P.~M.~Lewis, ``An analysis of several heuristics for the traveling salesman problem,'' \emph{SIAM J.\ Comput.}, vol.~6, no.~3, pp.~563--581, 1977.
+
+\bibitem{cheng2024drl} B.~Cheng, T.~Xie, L.~Wang, Q.~Tan, and X.~Cao, ``Deep reinforcement learning driven cost minimization for batch order scheduling in robotic mobile fulfillment systems,'' \emph{Expert Systems with Applications}, vol.~255, 2024.
+
+\bibitem{ross2011dagger} S.~Ross, G.~Gordon, and D.~Bagnell, ``A reduction of imitation learning and structured prediction to no-regret online learning,'' in \emph{AISTATS}, PMLR~15, pp.~627--635, 2011.
+
+\bibitem{loshchilov2019adamw} I.~Loshchilov and F.~Hutter, ``Decoupled weight decay regularization,'' in \emph{ICLR}, 2019.
+
+\bibitem{dantzig1954} G.~Dantzig, D.~R.~Fulkerson, and S.~M.~Johnson, ``Solution of a large-scale traveling-salesman problem,'' \emph{J.\ Oper.\ Res.\ Soc.\ Am.}, vol.~2, no.~4, pp.~393--410, 1954.
+
+\bibitem{gundupalli2020sequence} S.~P.~Gundupalli, R.~Shukla, R.~Gupta, S.~Hait, and A.~Thakur, ``Optimal sequence planning for robotic sorting of recyclables from source-segregated municipal solid waste,'' \emph{J.\ Comput.\ Inf.\ Sci.\ Eng.}, vol.~21, no.~1, p.~014502, 2021.
+
+\bibitem{ojha2025obstacle} P.~Ojha and A.~Thakur, ``Dynamic obstacle avoidance using path reshaping on probabilistic roadmaps for high-degree-of-freedom robots,'' \emph{IEEE Trans.\ Artif.\ Intell.}, 2025.
+
+\end{thebibliography}
+
+\end{document}

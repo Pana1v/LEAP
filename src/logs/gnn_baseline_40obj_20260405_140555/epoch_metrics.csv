@@ -1,0 +1,1 @@
+epoch,stage,train_loss,learning_rate,grad_norm,is_best,val_mean_cost,val_mean_gap_vs_greedy,val_gap_std,val_win_rate,val_mean_gap_vs_ilp,val_mean_cost_random

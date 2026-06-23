@@ -1,0 +1,191 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{chalasani1996}
+\citation{cheng2024drl}
+\citation{gundupalli2021sequence,kiyokawa2024challenges}
+\citation{dantzig1954}
+\citation{applegate2006concorde}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}\protected@file@percent }
+\citation{nair2021neural}
+\citation{dantzig1954}
+\citation{han2020pap}
+\citation{savelsbergh1995pdp}
+\citation{frederickson1978sc}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Literature Review}{4}{section.2}\protected@file@percent }
+\newlabel{sec:lit}{{2}{4}{Literature Review}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}PAP Sequencing and Its Relation to TSP}{4}{subsection.2.1}\protected@file@percent }
+\citation{kirkpatrick1983sa}
+\citation{glover1989tabu}
+\citation{voudouris2003gls}
+\citation{helsgaun2000lkh}
+\citation{ortools}
+\citation{rosenkrantz1977}
+\citation{vinyals2015pointer}
+\citation{kool2019attention}
+\citation{kwon2020pomo}
+\citation{kim2022symnco}
+\citation{costa2020learning2opt}
+\citation{perera2023gpn}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Classical Metaheuristics}{5}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Greedy Methods and Their Limits}{5}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Neural Combinatorial Optimisation}{5}{subsection.2.4}\protected@file@percent }
+\citation{cappart2023gnnco}
+\citation{chung2025ncosurvey}
+\citation{nair2021neural}
+\citation{khalil2016learning}
+\citation{gasse2019exact}
+\citation{sun2021sparsify}
+\citation{joshi2019gcntsp}
+\citation{fu2021gentsp}
+\citation{min2023utsp}
+\citation{kwon2021matnet}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}GNNs for Combinatorial Optimisation}{6}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Learning-Augmented Exact Solvers}{6}{subsection.2.6}\protected@file@percent }
+\citation{held1962dp}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Methods}{7}{section.3}\protected@file@percent }
+\newlabel{sec:methods}{{3}{7}{Methods}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Problem Formulation and Cost Model}{7}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Cycle-Aware Graph Representation}{8}{subsection.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Cyclic star topology. Each candidate pick-and-place action corresponds to two cost-bearing directed edges (robot$\to $object pick leg; object$\to $bin place leg) closed by a feedback edge for message passing only. Three node types carry type-encoded features processed by a standard GAT.}}{9}{figure.1}\protected@file@percent }
+\newlabel{fig:graph_topology}{{1}{9}{Cyclic star topology. Each candidate pick-and-place action corresponds to two cost-bearing directed edges (robot$\to $object pick leg; object$\to $bin place leg) closed by a feedback edge for message passing only. Three node types carry type-encoded features processed by a standard GAT}{figure.1}{}}
+\citation{loshchilov2019adamw}
+\citation{ortools}
+\citation{applegate2006concorde}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}GNN Architecture}{10}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Imitation Learning with Curriculum}{10}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}LEAP: Learning-Enhanced Arc Pruning}{10}{section.4}\protected@file@percent }
+\newlabel{sec:ilp_accel}{{4}{10}{LEAP: Learning-Enhanced Arc Pruning}{section.4}{}}
+\citation{caseau1997circuit,francis2014explaining}
+\citation{perron2023cpsat}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Curriculum-Based Imitation Learning}}{11}{algorithm.1}\protected@file@percent }
+\newlabel{alg:training}{{1}{11}{Imitation Learning with Curriculum}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Exact Solver and Verification}{11}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}CP-SAT Circuit Formulation}{11}{subsection.4.2}\protected@file@percent }
+\newlabel{sec:circuit}{{4.2}{11}{CP-SAT Circuit Formulation}{subsection.4.2}{}}
+\citation{nair2021neural}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Why Arc Pruning Outperformed Warm-Start Hinting}{12}{subsection.4.3}\protected@file@percent }
+\newlabel{sec:hint_fail}{{4.3}{12}{Why Arc Pruning Outperformed Warm-Start Hinting}{subsection.4.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}GNN-Guided Arc Pruning}{12}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.1}Procedure}{12}{subsubsection.4.4.1}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces GNN-Guided Arc Pruning}}{13}{algorithm.2}\protected@file@percent }
+\newlabel{alg:pruned}{{2}{13}{Procedure}{algorithm.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.2}Why This Works in Practice}{13}{subsubsection.4.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.3}Is Learned Arc Selection Necessary?}{14}{subsubsection.4.4.3}\protected@file@percent }
+\newlabel{sec:prune_ablation}{{4.4.3}{14}{Is Learned Arc Selection Necessary?}{subsubsection.4.4.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Is learned arc selection necessary? Pruning the CP-SAT Circuit solver at the same neighbourhood size $k{=}15$, comparing the GNN's learned arc ranking against non-learned cost-based pruning. \textbf  {Feasible} is the fraction of instances whose pruned arc set admits a Hamiltonian cycle; \textbf  {Gap} is to the unpruned proven optimum. Cost $k$-NN is almost always infeasible (no Hamiltonian cycle in the nearest-arc graph), forcing a fallback to the full solve.}}{14}{table.1}\protected@file@percent }
+\newlabel{tab:pruning_ablation}{{1}{14}{Is learned arc selection necessary? Pruning the CP-SAT Circuit solver at the same neighbourhood size $k{=}15$, comparing the GNN's learned arc ranking against non-learned cost-based pruning. \textbf {Feasible} is the fraction of instances whose pruned arc set admits a Hamiltonian cycle; \textbf {Gap} is to the unpruned proven optimum. Cost $k$-NN is almost always infeasible (no Hamiltonian cycle in the nearest-arc graph), forcing a fallback to the full solve}{table.1}{}}
+\citation{binning_dataset_2026}
+\citation{leap_software_2026}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Dataset and Experimental Setup}{15}{section.5}\protected@file@percent }
+\newlabel{sec:data}{{5}{15}{Dataset and Experimental Setup}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Reproducibility}{15}{subsection.5.1}\protected@file@percent }
+\newlabel{sec:reproducibility}{{5.1}{15}{Reproducibility}{subsection.5.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Results}{16}{section.6}\protected@file@percent }
+\newlabel{sec:results}{{6}{16}{Results}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}GNN Training and Standalone Evaluation}{16}{subsection.6.1}\protected@file@percent }
+\newlabel{sec:gnn_eval}{{6.1}{16}{GNN Training and Standalone Evaluation}{subsection.6.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.1}Training Dynamics}{16}{subsubsection.6.1.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Cross-entropy loss over 12 epochs, coloured by curriculum stage.}}{16}{figure.2}\protected@file@percent }
+\newlabel{fig:training_loss}{{2}{16}{Cross-entropy loss over 12 epochs, coloured by curriculum stage}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.2}Standalone Performance}{16}{subsubsection.6.1.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Validation win-rate vs.\ Greedy during training ($N{=}40$).}}{17}{figure.3}\protected@file@percent }
+\newlabel{fig:training_win_rate}{{3}{17}{Validation win-rate vs.\ Greedy during training ($N{=}40$)}{figure.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces GNN standalone vs.\ Greedy NC across problem sizes.}}{17}{table.2}\protected@file@percent }
+\newlabel{tab:cross_size}{{2}{17}{GNN standalone vs.\ Greedy NC across problem sizes}{table.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Per-sample GNN-to-ILP optimality gap ($N{=}10$, 10 scenarios evenly spaced across the gap distribution of the full $N{=}10$ validation split; mean gap 1.81\%, max 14.17\%).}}{18}{table.3}\protected@file@percent }
+\newlabel{tab:ilp_gap}{{3}{18}{Per-sample GNN-to-ILP optimality gap ($N{=}10$, 10 scenarios evenly spaced across the gap distribution of the full $N{=}10$ validation split; mean gap 1.81\%, max 14.17\%)}{table.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.3}Ablation Study}{18}{subsubsection.6.1.3}\protected@file@percent }
+\newlabel{sec:ablations}{{6.1.3}{18}{Ablation Study}{subsubsection.6.1.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Per-step cost advantage ($N{=}40$, averaged over 50 scenarios). Positive = GNN better. The GNN sacrifices early picks to position the robot favourably for later steps.}}{19}{figure.4}\protected@file@percent }
+\newlabel{fig:step_advantage}{{4}{19}{Per-step cost advantage ($N{=}40$, averaged over 50 scenarios). Positive = GNN better. The GNN sacrifices early picks to position the robot favourably for later steps}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Learning-Augmented Exact Solver}{19}{subsection.6.2}\protected@file@percent }
+\newlabel{sec:hybrid_eval}{{6.2}{19}{Learning-Augmented Exact Solver}{subsection.6.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Ablation study ($N{=}40$). Gap vs.\ greedy (\%): positive = better.}}{20}{table.4}\protected@file@percent }
+\newlabel{tab:ablations}{{4}{20}{Ablation study ($N{=}40$). Gap vs.\ greedy (\%): positive = better}{table.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.1}Comprehensive Comparison}{20}{subsubsection.6.2.1}\protected@file@percent }
+\newlabel{sec:baselines}{{6.2.1}{20}{Comprehensive Comparison}{subsubsection.6.2.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Cost vs.\ compute time at $N{=}200$. Each method is positioned by mean route cost (x-axis) and wall-clock time (y-axis, log scale); lower-left is ideal. Greedy NC (orange triangle) sets the cost baseline. GLS reaches within 0.02\% of the unpruned optimum in its 1\,s budget, though its gap is not quantified by the method itself. The unpruned CP-SAT Circuit solver finds the proven optimum in 4.04\,s; LEAP (green star) reaches an empirically near-optimal solution (max gap 0.058\% to the unpruned optimum) in 0.46\,s ($8.75\times $ faster than the unpruned solver, and faster than the metaheuristics' 1\,s budget). LEAP is the only point in the lower-left corner whose solution quality is backed by exact solving over the pruned arc set.}}{21}{figure.5}\protected@file@percent }
+\newlabel{fig:pareto_n200}{{5}{21}{Cost vs.\ compute time at $N{=}200$. Each method is positioned by mean route cost (x-axis) and wall-clock time (y-axis, log scale); lower-left is ideal. Greedy NC (orange triangle) sets the cost baseline. GLS reaches within 0.02\% of the unpruned optimum in its 1\,s budget, though its gap is not quantified by the method itself. The unpruned CP-SAT Circuit solver finds the proven optimum in 4.04\,s; LEAP (green star) reaches an empirically near-optimal solution (max gap 0.058\% to the unpruned optimum) in 0.46\,s ($8.75\times $ faster than the unpruned solver, and faster than the metaheuristics' 1\,s budget). LEAP is the only point in the lower-left corner whose solution quality is backed by exact solving over the pruned arc set}{figure.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Comprehensive comparison across problem sizes. \textbf  {Gap} (\%) measures improvement over Greedy NC (higher is better). \textbf  {Win\%} is the fraction of scenarios where the method beats Greedy NC. \textbf  {Time} is wall-clock time per scenario.}}{22}{table.5}\protected@file@percent }
+\newlabel{tab:baselines}{{5}{22}{Comprehensive comparison across problem sizes. \textbf {Gap} (\%) measures improvement over Greedy NC (higher is better). \textbf {Win\%} is the fraction of scenarios where the method beats Greedy NC. \textbf {Time} is wall-clock time per scenario}{table.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.2}Speedup Analysis}{22}{subsubsection.6.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.3}$k$-Sensitivity Analysis}{22}{subsubsection.6.2.3}\protected@file@percent }
+\newlabel{sec:k_sens}{{6.2.3}{22}{$k$-Sensitivity Analysis}{subsubsection.6.2.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Solve time scaling (log scale). LEAP ($k{=}15$) runs in 0.07\,s at $N{=}40$ and 0.46\,s at $N{=}200$; the unpruned CP-SAT Circuit solver grows from 0.04\,s at $N{=}40$ to 4.04\,s at $N{=}200$.}}{23}{figure.6}\protected@file@percent }
+\newlabel{fig:timing_scaling}{{6}{23}{Solve time scaling (log scale). LEAP ($k{=}15$) runs in 0.07\,s at $N{=}40$ and 0.46\,s at $N{=}200$; the unpruned CP-SAT Circuit solver grows from 0.04\,s at $N{=}40$ to 4.04\,s at $N{=}200$}{figure.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Per-method compute time at $N\!\in \!\{10, 40, 200\}$. Each violin is a log-normal whose first two moments match the published per-method mean and standard deviation; ticks mark the published mean. Distributions are illustrative (we have aggregate, not per-scenario, timings on file). The figure makes the cross-method ordering visible at every scale: at $N{=}200$, LEAP's median solve time is $8.75\times $ below the unpruned CP-SAT Circuit solver and below the metaheuristics' fixed 1\,s budget, while LKH (\texttt  {elkai}, runs=1) attains the optimum but at ${\sim }5\,$s and OR-Tools' 2-opt local search is fast but settles in a weaker local optimum.}}{23}{figure.7}\protected@file@percent }
+\newlabel{fig:runtime_hist}{{7}{23}{Per-method compute time at $N\!\in \!\{10, 40, 200\}$. Each violin is a log-normal whose first two moments match the published per-method mean and standard deviation; ticks mark the published mean. Distributions are illustrative (we have aggregate, not per-scenario, timings on file). The figure makes the cross-method ordering visible at every scale: at $N{=}200$, LEAP's median solve time is $8.75\times $ below the unpruned CP-SAT Circuit solver and below the metaheuristics' fixed 1\,s budget, while LKH (\texttt {elkai}, runs=1) attains the optimum but at ${\sim }5\,$s and OR-Tools' 2-opt local search is fast but settles in a weaker local optimum}{figure.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces LEAP speedup ($k{=}15$) vs.\ unpruned CP-SAT Circuit solver.}}{24}{table.6}\protected@file@percent }
+\newlabel{tab:ilp_speedup}{{6}{24}{LEAP speedup ($k{=}15$) vs.\ unpruned CP-SAT Circuit solver}{table.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces $k$-sensitivity Pareto frontier (fast-rollout sweep on this hardware, 20 val scenarios per $N$, solver wall-clock only). Solid lines: CP-SAT solver time (left axis, log scale). Dashed lines: worst-case optimality gap (right axis). Smaller $k$ shrinks the arc set further (faster, but the optimum may fall outside the top-$k$); larger $k$ tightens the gap toward zero at the cost of additional decision variables. $k{=}15$ (recommended) is Pareto-optimal: any faster $k$ has a substantially worse gap; any tighter $k$ is slower.}}{24}{figure.8}\protected@file@percent }
+\newlabel{fig:k_pareto}{{8}{24}{$k$-sensitivity Pareto frontier (fast-rollout sweep on this hardware, 20 val scenarios per $N$, solver wall-clock only). Solid lines: CP-SAT solver time (left axis, log scale). Dashed lines: worst-case optimality gap (right axis). Smaller $k$ shrinks the arc set further (faster, but the optimum may fall outside the top-$k$); larger $k$ tightens the gap toward zero at the cost of additional decision variables. $k{=}15$ (recommended) is Pareto-optimal: any faster $k$ has a substantially worse gap; any tighter $k$ is slower}{figure.8}{}}
+\citation{nair2021neural}
+\citation{joshi2021rethinking}
+\citation{vinyals2015pointer}
+\citation{kool2019attention}
+\citation{kwon2021matnet}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces LEAP $k$-sensitivity. All rows from the fast-rollout sweep on this hardware (20 val scenarios per $N$). \textbf  {Time column reports CP-SAT solver wall-clock only} (GNN inference is $k$-independent: 0.05--0.20\,s depending on $N$, added uniformly to every row to obtain end-to-end LEAP wall-clock as in Table~\ref {tab:baselines}). All comparisons against the unpruned CP-SAT Circuit solver: $N{=}40$: 0.11\,s; $N{=}100$: 0.81\,s; $N{=}200$: 6.87\,s.}}{25}{table.7}\protected@file@percent }
+\newlabel{tab:k_sens}{{7}{25}{LEAP $k$-sensitivity. All rows from the fast-rollout sweep on this hardware (20 val scenarios per $N$). \textbf {Time column reports CP-SAT solver wall-clock only} (GNN inference is $k$-independent: 0.05--0.20\,s depending on $N$, added uniformly to every row to obtain end-to-end LEAP wall-clock as in Table~\ref {tab:baselines}). All comparisons against the unpruned CP-SAT Circuit solver: $N{=}40$: 0.11\,s; $N{=}100$: 0.81\,s; $N{=}200$: 6.87\,s}{table.7}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.4}Why Pruning Outperformed Hinting in Our Experiments}{25}{subsubsection.6.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Limitations}{25}{subsection.6.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces GNN-assisted solver strategies ($N{=}40$ except where noted). Each row reports speedup against its own un-assisted baseline (\textit  {Baseline} column): the CBC+MTZ rows must be compared against CBC cold-solve because \texttt  {SetHint} is a CBC-only API, while the CP-SAT rows compare against the unpruned CP-SAT Circuit solver. Pruning outperforms all hinting approaches.}}{26}{table.8}\protected@file@percent }
+\newlabel{tab:hint_comparison}{{8}{26}{GNN-assisted solver strategies ($N{=}40$ except where noted). Each row reports speedup against its own un-assisted baseline (\textit {Baseline} column): the CBC+MTZ rows must be compared against CBC cold-solve because \texttt {SetHint} is a CBC-only API, while the CP-SAT rows compare against the unpruned CP-SAT Circuit solver. Pruning outperforms all hinting approaches}{table.8}{}}
+\citation{applegate2006concorde}
+\citation{helsgaun2000lkh}
+\citation{ross2011dagger}
+\citation{han2020pap}
+\citation{ojha2026obstacle}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{27}{section.7}\protected@file@percent }
+\newlabel{sec:conclusion}{{7}{27}{Conclusion}{section.7}{}}
+\citation{binning_dataset_2026}
+\citation{leap_software_2026}
+\bibstyle{elsarticle-num}
+\bibdata{refs}
+\bibcite{chalasani1996}{{1}{}{{}}{{}}}
+\bibcite{cheng2024drl}{{2}{}{{}}{{}}}
+\@writefile{toc}{\let\numberline\tmptocnumberline}
+\@writefile{toc}{\contentsline {section}{\numberline {Appendix~A}Node Feature Vector Layout}{28}{section.A}\protected@file@percent }
+\newlabel{app:features}{{Appendix~A}{28}{Node Feature Vector Layout}{section.A}{}}
+\bibcite{gundupalli2021sequence}{{3}{}{{}}{{}}}
+\bibcite{kiyokawa2024challenges}{{4}{}{{}}{{}}}
+\bibcite{dantzig1954}{{5}{}{{}}{{}}}
+\bibcite{applegate2006concorde}{{6}{}{{}}{{}}}
+\bibcite{nair2021neural}{{7}{}{{}}{{}}}
+\bibcite{han2020pap}{{8}{}{{}}{{}}}
+\bibcite{savelsbergh1995pdp}{{9}{}{{}}{{}}}
+\bibcite{frederickson1978sc}{{10}{}{{}}{{}}}
+\bibcite{kirkpatrick1983sa}{{11}{}{{}}{{}}}
+\bibcite{glover1989tabu}{{12}{}{{}}{{}}}
+\bibcite{voudouris2003gls}{{13}{}{{}}{{}}}
+\bibcite{helsgaun2000lkh}{{14}{}{{}}{{}}}
+\bibcite{ortools}{{15}{}{{}}{{}}}
+\bibcite{rosenkrantz1977}{{16}{}{{}}{{}}}
+\bibcite{vinyals2015pointer}{{17}{}{{}}{{}}}
+\bibcite{kool2019attention}{{18}{}{{}}{{}}}
+\bibcite{kwon2020pomo}{{19}{}{{}}{{}}}
+\bibcite{kim2022symnco}{{20}{}{{}}{{}}}
+\bibcite{costa2020learning2opt}{{21}{}{{}}{{}}}
+\bibcite{perera2023gpn}{{22}{}{{}}{{}}}
+\bibcite{cappart2023gnnco}{{23}{}{{}}{{}}}
+\bibcite{chung2025ncosurvey}{{24}{}{{}}{{}}}
+\bibcite{khalil2016learning}{{25}{}{{}}{{}}}
+\bibcite{gasse2019exact}{{26}{}{{}}{{}}}
+\bibcite{sun2021sparsify}{{27}{}{{}}{{}}}
+\bibcite{joshi2019gcntsp}{{28}{}{{}}{{}}}
+\bibcite{fu2021gentsp}{{29}{}{{}}{{}}}
+\bibcite{min2023utsp}{{30}{}{{}}{{}}}
+\bibcite{kwon2021matnet}{{31}{}{{}}{{}}}
+\bibcite{held1962dp}{{32}{}{{}}{{}}}
+\bibcite{loshchilov2019adamw}{{33}{}{{}}{{}}}
+\bibcite{caseau1997circuit}{{34}{}{{}}{{}}}
+\bibcite{francis2014explaining}{{35}{}{{}}{{}}}
+\bibcite{perron2023cpsat}{{36}{}{{}}{{}}}
+\bibcite{binning_dataset_2026}{{37}{}{{}}{{}}}
+\bibcite{leap_software_2026}{{38}{}{{}}{{}}}
+\bibcite{joshi2021rethinking}{{39}{}{{}}{{}}}
+\bibcite{ross2011dagger}{{40}{}{{}}{{}}}
+\bibcite{ojha2026obstacle}{{41}{}{{}}{{}}}
+\providecommand\NAT@force@numbers{}\NAT@force@numbers
+\gdef \@abspage@last{32}

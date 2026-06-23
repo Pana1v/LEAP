@@ -1,0 +1,68 @@
+{
+  "A1_cyclic_star": {
+    "mean_cost": 3799.6179438710215,
+    "mean_gap_vs_greedy": 2.590118100623929,
+    "gap_std": 1.9130624837532457,
+    "win_rate": 93.0
+  },
+  "A1_fully_connected": {
+    "mean_cost": 4864.700951361656,
+    "mean_gap_vs_greedy": -24.837242917515486,
+    "gap_std": 5.120918384874643,
+    "win_rate": 0.0
+  },
+  "A1_knn": {
+    "mean_cost": 3869.2893170154093,
+    "mean_gap_vs_greedy": 0.7905458820805181,
+    "gap_std": 2.5500261045677477,
+    "win_rate": 62.0
+  },
+  "A2_gat": {
+    "mean_cost": 3799.6179438710215,
+    "mean_gap_vs_greedy": 2.590118100623929,
+    "gap_std": 1.9130624837532457,
+    "win_rate": 93.0
+  },
+  "A2_gcn": {
+    "mean_cost": 3919.5721189272404,
+    "mean_gap_vs_greedy": -0.5066867037685475,
+    "gap_std": 2.3910103931892865,
+    "win_rate": 38.0
+  },
+  "A2_mlp": {
+    "mean_cost": 4840.155346773863,
+    "mean_gap_vs_greedy": -24.218412938991122,
+    "gap_std": 5.437926258595255,
+    "win_rate": 0.0
+  },
+  "A3_curriculum": {
+    "mean_cost": 3799.6179438710215,
+    "mean_gap_vs_greedy": 2.590118100623929,
+    "gap_std": 1.9130624837532457,
+    "win_rate": 93.0
+  },
+  "A3_no_curriculum": {
+    "mean_cost": 3892.5462066698074,
+    "mean_gap_vs_greedy": 0.22484387934142055,
+    "gap_std": 1.3104110827623845,
+    "win_rate": 52.0
+  },
+  "A4_mixed": {
+    "mean_cost": 3799.6179438710215,
+    "mean_gap_vs_greedy": 2.590118100623929,
+    "gap_std": 1.9130624837532457,
+    "win_rate": 93.0
+  },
+  "A4_ilp_only": {
+    "mean_cost": 3783.83850843668,
+    "mean_gap_vs_greedy": 2.995448902469061,
+    "gap_std": 1.848319288619495,
+    "win_rate": 92.0
+  },
+  "A4_greedy_only": {
+    "mean_cost": 3952.1804257524013,
+    "mean_gap_vs_greedy": -1.3118463673791907,
+    "gap_std": 2.1223346816424224,
+    "win_rate": 28.999999999999996
+  }
+}

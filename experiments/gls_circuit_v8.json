@@ -1,0 +1,38 @@
+{
+  "config": {
+    "time_limit_ms": 1000,
+    "val_seed": 42
+  },
+  "per_n": {
+    "10": {
+      "n_scenarios": 50,
+      "mean_cost": 959.4749159475031,
+      "greedy_mean_cost": 1030.1917048645018,
+      "gap_vs_greedy_pct_mean": 6.86898410154486,
+      "win_rate_pct": 100.0,
+      "time_mean_ms": 1000.653567314148,
+      "time_median_ms": 1000.6403923034668,
+      "time_p95_ms": 1000.8837103843689
+    },
+    "40": {
+      "n_scenarios": 50,
+      "mean_cost": 3740.588301798302,
+      "greedy_mean_cost": 3907.9270014953613,
+      "gap_vs_greedy_pct_mean": 4.2659977887780345,
+      "win_rate_pct": 100.0,
+      "time_mean_ms": 1000.8698463439941,
+      "time_median_ms": 1000.8289813995361,
+      "time_p95_ms": 1001.2788772583008
+    },
+    "200": {
+      "n_scenarios": 20,
+      "mean_cost": 18426.73921865899,
+      "greedy_mean_cost": 18780.937836492063,
+      "gap_vs_greedy_pct_mean": 1.8820989997090685,
+      "win_rate_pct": 100.0,
+      "time_mean_ms": 1000.1439690589905,
+      "time_median_ms": 999.9196529388428,
+      "time_p95_ms": 1000.8161187171936
+    }
+  }
+}

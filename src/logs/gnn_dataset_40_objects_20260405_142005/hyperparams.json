@@ -1,0 +1,21 @@
+{
+  "epochs_per_stage": 3,
+  "epochs_final": 6,
+  "hidden_dim": 128,
+  "heads": 4,
+  "dropout": 0.1,
+  "lr": 0.001,
+  "weight_decay": 0.01,
+  "val_split": 0.1,
+  "accumulate_grad": 8,
+  "seed": 0,
+  "device": "cpu",
+  "num_train_scenarios": 990,
+  "num_val_scenarios": 110,
+  "object_count": 40,
+  "stages": [
+    5,
+    10,
+    20
+  ]
+}

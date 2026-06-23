@@ -1,0 +1,49 @@
+{
+  "dataset_name": "dataset_200_objects",
+  "model_type": "gnn",
+  "hyperparams": {
+    "epochs_per_stage": 3,
+    "epochs_final": 6,
+    "hidden_dim": 128,
+    "heads": 4,
+    "dropout": 0.1,
+    "lr": 0.001,
+    "weight_decay": 0.01,
+    "val_split": 0.1,
+    "accumulate_grad": 8,
+    "seed": 0,
+    "device": "cpu",
+    "num_train_scenarios": 4500,
+    "num_val_scenarios": 500,
+    "object_count": 200,
+    "stages": [
+      5,
+      10,
+      20
+    ]
+  },
+  "stage_transitions": [
+    {
+      "from_stage": 5,
+      "to_stage": 10,
+      "epoch": 3
+    },
+    {
+      "from_stage": 10,
+      "to_stage": 20,
+      "epoch": 6
+    }
+  ],
+  "final_metrics": {
+    "metrics": {
+      "mean_cost": 18510.15519661875,
+      "mean_gap_vs_greedy": 1.5304220419726888,
+      "gap_std": 0.7636857314742932,
+      "win_rate": 99.6,
+      "mean_gap_vs_ilp": -886.1063398793507,
+      "mean_cost_random": 24477.51834598285
+    },
+    "beam_search": false
+  },
+  "num_epochs": 12
+}

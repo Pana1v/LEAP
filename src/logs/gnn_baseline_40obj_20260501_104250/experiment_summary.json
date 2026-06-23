@@ -1,0 +1,52 @@
+{
+  "experiment_name": "gnn_baseline_40obj",
+  "model_type": "gnn",
+  "dataset": "../data/dataset_40_objects.json",
+  "hyperparams": {
+    "epochs_per_stage": 6,
+    "epochs_final": 18,
+    "hidden_dim": 128,
+    "heads": 4,
+    "dropout": 0.1,
+    "lr": 0.001,
+    "weight_decay": 0.01,
+    "val_split": 0.1,
+    "accumulate_grad": 8,
+    "seed": 0,
+    "device": "cuda",
+    "num_train_scenarios": 4500,
+    "num_val_scenarios": 500,
+    "object_count": 40,
+    "stages": [
+      5,
+      10,
+      20
+    ]
+  },
+  "final_metrics": {
+    "metrics": {
+      "mean_cost": 3762.655548324883,
+      "mean_gap_vs_greedy": 3.4868011808785915,
+      "gap_std": 1.8730971988322993,
+      "win_rate": 98.4,
+      "mean_gap_vs_ilp": -100.24340033729304,
+      "mean_cost_random": 4876.80969033587
+    },
+    "beam_search": false,
+    "inference_stats": {
+      "mean_ms": 58.437926980041084,
+      "std_ms": 0.6893866893243045,
+      "median_ms": 58.263409500796115,
+      "p95_ms": 59.109220150821784,
+      "num_samples": 100
+    }
+  },
+  "inference_stats": {
+    "mean_ms": 58.437926980041084,
+    "std_ms": 0.6893866893243045,
+    "median_ms": 58.263409500796115,
+    "p95_ms": 59.109220150821784,
+    "num_samples": 100
+  },
+  "num_epochs": 30
+}

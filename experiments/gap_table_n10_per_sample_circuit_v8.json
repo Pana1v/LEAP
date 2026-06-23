@@ -1,0 +1,92 @@
+[
+  {
+    "val_idx": 470,
+    "gnn_cost": 933.4197082519531,
+    "ilp_cost_circuit": 933.4198884765625,
+    "ilp_cost_stored_mtz": 933.4197635650635,
+    "greedy_cost": 936.2212944030762,
+    "gap_vs_ilp_pct": -1.930798899886526e-05,
+    "gap_vs_greedy_pct": 0.29924401077731366
+  },
+  {
+    "val_idx": 202,
+    "gnn_cost": 818.3607873916626,
+    "ilp_cost_circuit": 818.360771875,
+    "ilp_cost_stored_mtz": 818.3608045578003,
+    "greedy_cost": 866.6177787780762,
+    "gap_vs_ilp_pct": 1.896066279816412e-06,
+    "gap_vs_greedy_pct": 5.568428500792533
+  },
+  {
+    "val_idx": 112,
+    "gnn_cost": 1075.2744913101196,
+    "ilp_cost_circuit": 1074.90646640625,
+    "ilp_cost_stored_mtz": 1074.9065046310425,
+    "greedy_cost": 1075.274486541748,
+    "gap_vs_ilp_pct": 0.0342378537455454,
+    "gap_vs_greedy_pct": -4.434562190131641e-07
+  },
+  {
+    "val_idx": 401,
+    "gnn_cost": 1076.5027680397034,
+    "ilp_cost_circuit": 1072.6877387695313,
+    "ilp_cost_stored_mtz": 1072.6876006126404,
+    "greedy_cost": 1112.9403381347656,
+    "gap_vs_ilp_pct": 0.35565142886300444,
+    "gap_vs_greedy_pct": 3.273991322493519
+  },
+  {
+    "val_idx": 245,
+    "gnn_cost": 843.1187343597412,
+    "ilp_cost_circuit": 836.0984880859376,
+    "ilp_cost_stored_mtz": 836.0984735488892,
+    "greedy_cost": 930.4673843383789,
+    "gap_vs_ilp_pct": 0.8396434599319692,
+    "gap_vs_greedy_pct": 9.38761008165247
+  },
+  {
+    "val_idx": 469,
+    "gnn_cost": 1011.8915691375732,
+    "ilp_cost_circuit": 996.7224709960938,
+    "ilp_cost_stored_mtz": 996.7224273681641,
+    "greedy_cost": 1021.8404235839844,
+    "gap_vs_ilp_pct": 1.5218978785859971,
+    "gap_vs_greedy_pct": 0.9736211463935536
+  },
+  {
+    "val_idx": 377,
+    "gnn_cost": 1080.4921207427979,
+    "ilp_cost_circuit": 1056.9559411132814,
+    "ilp_cost_stored_mtz": 1056.955985069275,
+    "greedy_cost": 1122.6857261657715,
+    "gap_vs_ilp_pct": 2.2267890944182644,
+    "gap_vs_greedy_pct": 3.758273971031452
+  },
+  {
+    "val_idx": 422,
+    "gnn_cost": 1024.751256942749,
+    "ilp_cost_circuit": 995.2329186523438,
+    "ilp_cost_stored_mtz": 995.2329006195068,
+    "greedy_cost": 1035.47172164917,
+    "gap_vs_ilp_pct": 2.9659728629531656,
+    "gap_vs_greedy_pct": 1.0353218231152352
+  },
+  {
+    "val_idx": 306,
+    "gnn_cost": 961.2177963256836,
+    "ilp_cost_circuit": 920.3269681640625,
+    "ilp_cost_stored_mtz": 920.3269958496094,
+    "greedy_cost": 1053.0406875610352,
+    "gap_vs_ilp_pct": 4.4430761648974855,
+    "gap_vs_greedy_pct": 8.719785694893146
+  },
+  {
+    "val_idx": 64,
+    "gnn_cost": 1054.3765258789062,
+    "ilp_cost_circuit": 923.494581640625,
+    "ilp_cost_stored_mtz": 923.4946212768555,
+    "greedy_cost": 978.7623062133789,
+    "gap_vs_ilp_pct": 14.172464770260396,
+    "gap_vs_greedy_pct": -7.725493634717353
+  }
+]

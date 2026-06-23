@@ -1,0 +1,135 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{chalasani1996}
+P.~Chalasani, R.~Motwani, A.~Rao, Algorithms for robot grasp and delivery, in: 2nd Workshop on the Algorithmic Foundations of Robotics (WAFR), 1996.
+
+\bibitem{cheng2024drl}
+B.~Cheng, et~al., Deep reinforcement learning driven cost minimization for batch order scheduling in robotic mobile fulfillment systems, Expert Systems with Applications 255 (2024).
+
+\bibitem{gundupalli2021sequence}
+S.~P. Gundupalli, et~al., Optimal sequence planning for robotic sorting of recyclables from source-segregated municipal solid waste, Journal of Computing and Information Science in Engineering 21~(1) (2021) 014502.
+
+\bibitem{kiyokawa2024challenges}
+T.~Kiyokawa, J.~Takamatsu, S.~Koyanaka, Challenges for future robotic sorters of mixed industrial waste: A survey, IEEE Transactions on Automation Science and Engineering 21 (2024) 1023--1040.
+
+\bibitem{dantzig1954}
+G.~Dantzig, D.~R. Fulkerson, S.~M. Johnson, Solution of a large-scale traveling-salesman problem, Journal of the Operations Research Society of America 2~(4) (1954) 393--410.
+
+\bibitem{applegate2006concorde}
+D.~L. Applegate, R.~E. Bixby, V.~Chv{\'a}tal, W.~J. Cook, The Traveling Salesman Problem: A Computational Study, Princeton University Press, Princeton, NJ, 2006.
+
+\bibitem{nair2021neural}
+V.~Nair, et~al., Solving mixed integer programs using neural networks, arXiv:2012.13349 (2021).
+\newblock \href {http://arxiv.org/abs/2012.13349} {\path{arXiv:2012.13349}}.
+
+\bibitem{han2020pap}
+S.~D. Han, S.~W. Feng, J.~Yu, Toward fast and optimal robotic pick-and-place on a moving conveyor, IEEE Robotics and Automation Letters 5~(2) (2020) 446--453.
+
+\bibitem{savelsbergh1995pdp}
+M.~W.~P. Savelsbergh, M.~Sol, The general pickup and delivery problem, Transportation Science 29~(1) (1995) 17--29.
+
+\bibitem{frederickson1978sc}
+G.~N. Frederickson, M.~S. Hecht, C.~E. Kim, Approximation algorithms for some routing problems, SIAM Journal on Computing 7~(2) (1978) 178--193.
+
+\bibitem{kirkpatrick1983sa}
+S.~Kirkpatrick, C.~D. Gelatt, M.~P. Vecchi, Optimization by simulated annealing, Science 220~(4598) (1983) 671--680.
+
+\bibitem{glover1989tabu}
+F.~Glover, Tabu search---part {I}, ORSA Journal on Computing 1~(3) (1989) 190--206.
+
+\bibitem{voudouris2003gls}
+C.~Voudouris, E.~P.~K. Tsang, Guided local search, in: Handbook of Metaheuristics, Kluwer, 2003, pp. 185--218.
+
+\bibitem{helsgaun2000lkh}
+K.~Helsgaun, An effective implementation of the {Lin--Kernighan} traveling salesman heuristic, European Journal of Operational Research 126~(1) (2000) 106--130.
+
+\bibitem{ortools}
+{Google}, {OR-Tools}: {Google's} operations research tools, \url{https://developers.google.com/optimization} (2024).
+
+\bibitem{rosenkrantz1977}
+D.~J. Rosenkrantz, R.~E. Stearns, P.~M. Lewis, An analysis of several heuristics for the traveling salesman problem, SIAM Journal on Computing 6~(3) (1977) 563--581.
+
+\bibitem{vinyals2015pointer}
+O.~Vinyals, M.~Fortunato, N.~Jaitly, Pointer networks, in: Advances in Neural Information Processing Systems (NeurIPS), Vol.~28, 2015.
+
+\bibitem{kool2019attention}
+W.~Kool, H.~{van Hoof}, M.~Welling, Attention, learn to solve routing problems!, in: International Conference on Learning Representations (ICLR), 2019.
+
+\bibitem{kwon2020pomo}
+Y.~D. Kwon, et~al., {POMO}: Policy optimization with multiple optima for reinforcement learning, in: Advances in Neural Information Processing Systems (NeurIPS), Vol.~33, 2020, pp. 21188--21198.
+
+\bibitem{kim2022symnco}
+M.~Kim, J.~Park, J.~Park, {Sym-NCO}: Leveraging symmetricity for neural combinatorial optimization, in: Advances in Neural Information Processing Systems (NeurIPS), Vol.~35, 2022, pp. 1936--1949.
+
+\bibitem{costa2020learning2opt}
+P.~R. {de O. Costa}, et~al., Learning 2-opt heuristics for the traveling salesman problem via deep reinforcement learning, in: Asian Conference on Machine Learning (ACML), PMLR, 2020, pp. 465--480.
+
+\bibitem{perera2023gpn}
+J.~Perera, et~al., A graph pointer network-based multi-objective deep reinforcement learning algorithm for solving the traveling salesman problem, Mathematics 11~(2) (2023) 437.
+
+\bibitem{cappart2023gnnco}
+Q.~Cappart, et~al., Combinatorial optimization and reasoning with graph neural networks, Journal of Machine Learning Research (JMLR) 24~(130) (2023) 1--61.
+
+\bibitem{chung2025ncosurvey}
+K.~T. Chung, C.~K.~M. Lee, Y.~P. Tsang, Neural combinatorial optimization with reinforcement learning in industrial engineering: a survey, Artificial Intelligence Review 58 (2025) 130.
+
+\bibitem{khalil2016learning}
+E.~B. Khalil, et~al., Learning to branch in mixed integer programming, in: AAAI Conference on Artificial Intelligence, 2016, pp. 724--731.
+
+\bibitem{gasse2019exact}
+M.~Gasse, et~al., Exact combinatorial optimization with graph convolutional neural networks, in: Advances in Neural Information Processing Systems (NeurIPS), Vol.~32, 2019.
+
+\bibitem{sun2021sparsify}
+Y.~Sun, A.~Ernst, X.~Li, J.~Weiner, Generalization of machine learning for problem reduction: a case study on travelling salesman problems, OR Spectrum 43~(3) (2021) 607--633.
+
+\bibitem{joshi2019gcntsp}
+C.~K. Joshi, T.~Laurent, X.~Bresson, An efficient graph convolutional network technique for the travelling salesman problem, arXiv:1906.01227 (2019).
+\newblock \href {http://arxiv.org/abs/1906.01227} {\path{arXiv:1906.01227}}.
+
+\bibitem{fu2021gentsp}
+Z.-H. Fu, K.-B. Qiu, H.~Zha, Generalize a small pre-trained model to arbitrarily large {TSP} instances, in: AAAI Conference on Artificial Intelligence, Vol.~35, 2021, pp. 7474--7482.
+
+\bibitem{min2023utsp}
+Y.~Min, Y.~Bai, C.~P. Gomes, Unsupervised learning for solving the travelling salesman problem, in: Advances in Neural Information Processing Systems (NeurIPS), Vol.~36, 2023.
+
+\bibitem{kwon2021matnet}
+Y.-D. Kwon, J.~Choo, I.~Yoon, M.~Park, D.~Park, Y.~Gwon, {MatNet}: Matrix encoding networks for neural combinatorial optimization, in: Advances in Neural Information Processing Systems (NeurIPS), Vol.~34, 2021, pp. 5138--5149.
+
+\bibitem{held1962dp}
+M.~Held, R.~M. Karp, A dynamic programming approach to sequencing problems, Journal of the Society for Industrial and Applied Mathematics 10~(1) (1962) 196--210.
+
+\bibitem{loshchilov2019adamw}
+I.~Loshchilov, F.~Hutter, Decoupled weight decay regularization, in: International Conference on Learning Representations (ICLR), 2019.
+
+\bibitem{caseau1997circuit}
+Y.~Caseau, F.~Laburthe, Solving small {TSPs} with constraints, in: International Conference on Logic Programming (ICLP), 1997, pp. 316--330.
+
+\bibitem{francis2014explaining}
+K.~G. Francis, P.~J. Stuckey, Explaining circuit propagation, Constraints 19~(1) (2014) 1--29.
+
+\bibitem{perron2023cpsat}
+L.~Perron, F.~Didier, S.~Gay, The {CP-SAT-LP} solver, in: Proc. 29th International Conference on Principles and Practice of Constraint Programming (CP), 2023.
+
+\bibitem{binning_dataset_2026}
+{Anonymous Author(s)}, Asymmetric pick-and-place sequencing benchmark: 35{,}000 scenarios with {ILP}-optimal prefixes, Zenodo, [dataset]; de-anonymized upon acceptance (2026).
+\newblock \href {https://doi.org/10.5281/zenodo.XXXXXXX} {\path{doi:10.5281/zenodo.XXXXXXX}}.
+
+\bibitem{leap_software_2026}
+{Anonymous Author(s)}, {LEAP}: Learning-enhanced arc pruning --- source code and trained checkpoints, Zenodo, [software]; de-anonymized upon acceptance (2026).
+\newblock \href {https://doi.org/10.5281/zenodo.YYYYYYY} {\path{doi:10.5281/zenodo.YYYYYYY}}.
+
+\bibitem{joshi2021rethinking}
+C.~K. Joshi, Q.~Cappart, L.-M. Rousseau, T.~Laurent, Learning {TSP} requires rethinking generalization, in: Proc. 27th International Conference on Principles and Practice of Constraint Programming (CP), 2021.
+
+\bibitem{ross2011dagger}
+S.~Ross, G.~Gordon, D.~Bagnell, A reduction of imitation learning and structured prediction to no-regret online learning, in: International Conference on Artificial Intelligence and Statistics (AISTATS), PMLR, Vol.~15, 2011, pp. 627--635.
+
+\bibitem{ojha2026obstacle}
+P.~Ojha, A.~Thakur, Dynamic obstacle avoidance using path reshaping on probabilistic roadmaps for high-degree-of-freedom robots, IEEE Transactions on Artificial Intelligence 7~(2) (2026) 818--827.
+
+\end{thebibliography}
